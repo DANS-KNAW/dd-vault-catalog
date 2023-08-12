@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.catalog.db;
+package nl.knaw.dans.catalog.core;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

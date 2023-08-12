@@ -17,11 +17,20 @@ package nl.knaw.dans.catalog.cli;
 
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.hibernate.UnitOfWorkAwareProxyFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.inf.Namespace;
 import nl.knaw.dans.catalog.DdVaultCatalogConfiguration;
-import nl.knaw.dans.catalog.UseCasesBuilder;
+import nl.knaw.dans.catalog.core.SearchIndex;
+import nl.knaw.dans.catalog.core.UseCases;
+import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
+import nl.knaw.dans.catalog.core.mappers.TarMapper;
+import nl.knaw.dans.catalog.core.solr.OcflObjectMetadataReader;
+import nl.knaw.dans.catalog.core.solr.SolrIndex;
+import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
+import nl.knaw.dans.catalog.db.TarDao;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +59,30 @@ public class ReindexCommand extends ConfiguredCommand<DdVaultCatalogConfiguratio
 
         log.info("Configured Hibernate");
 
-        var useCases = UseCasesBuilder.build(configuration, hibernateBundle);
+        var ocflObjectMetadataReader = new OcflObjectMetadataReader();
+        var searchIndex = new SolrIndex(configuration.getSolr(), ocflObjectMetadataReader);
+        var ocflObjectVersionDao = new OcflObjectVersionDao(hibernateBundle.getSessionFactory());
+        var tarDao = new TarDao(hibernateBundle.getSessionFactory());
+        var ocflObjectVersionMapper = Mappers.getMapper(OcflObjectVersionMapper.class);
+        var tarMapper = Mappers.getMapper(TarMapper.class);
+
+        var useCases = new UnitOfWorkAwareProxyFactory(hibernateBundle)
+            .create(UseCases.class,
+                new Class[] {
+                    OcflObjectVersionDao.class,
+                    TarDao.class,
+                    OcflObjectVersionMapper.class,
+                    TarMapper.class,
+                    SearchIndex.class,
+                },
+                new Object[] {
+                    ocflObjectVersionDao,
+                    tarDao,
+                    ocflObjectVersionMapper,
+                    tarMapper,
+                    searchIndex
+                }
+            );
 
         log.info("Configured services");
 

@@ -19,9 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
-import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
-import nl.knaw.dans.catalog.core.domain.OcflObjectVersionParameters;
-import nl.knaw.dans.catalog.db.OcflObjectVersion;
+import nl.knaw.dans.catalog.core.OcflObjectVersion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -34,8 +32,6 @@ public interface OcflObjectVersionMapper {
     OcflObjectVersionMapper INSTANCE = Mappers.getMapper(OcflObjectVersionMapper.class);
 
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    OcflObjectVersionParameters convert(OcflObjectVersionParametersDto versionDto);
 
     @Mapping(source = "tar.tarUuid", target = "tarUuid")
     OcflObjectVersionDto convert(OcflObjectVersion version) ;

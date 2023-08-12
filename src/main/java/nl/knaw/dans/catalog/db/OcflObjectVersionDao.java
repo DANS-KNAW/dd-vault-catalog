@@ -17,7 +17,7 @@ package nl.knaw.dans.catalog.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
 import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
-import nl.knaw.dans.catalog.core.domain.OcflObjectVersionId;
+import nl.knaw.dans.catalog.core.OcflObjectVersion;
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionNotFoundException;
 import org.hibernate.SessionFactory;
 
@@ -27,8 +27,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class OcflObjectVersionDAO extends AbstractDAO<OcflObjectVersion>  {
-    public OcflObjectVersionDAO(SessionFactory sessionFactory) {
+public class OcflObjectVersionDao extends AbstractDAO<OcflObjectVersion>  {
+    public OcflObjectVersionDao(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 
@@ -72,23 +72,6 @@ public class OcflObjectVersionDAO extends AbstractDAO<OcflObjectVersion>  {
 
         var merged = (OcflObjectVersion) (currentSession().merge(ocflObjectVersion));
         return persist(merged);
-    }
-
-    public List<OcflObjectVersion> findAll(Collection<OcflObjectVersionId> versions, boolean old) throws OcflObjectVersionNotFoundException {
-        var ocflObjectVersions = new ArrayList<OcflObjectVersion>();
-
-        if (versions != null) {
-            for (var version : versions) {
-                var ocflObjectVersion = findByBagIdAndVersion(version.getBagId(), version.getObjectVersion())
-                    .orElseThrow(() -> new OcflObjectVersionNotFoundException(
-                        String.format("OcflObjectVersion with bagId %s and version %d not found", version.getBagId(), version.getObjectVersion())
-                    ));
-
-                ocflObjectVersions.add(ocflObjectVersion);
-            }
-        }
-
-        return ocflObjectVersions;
     }
 
     public List<OcflObjectVersion> findAll(Collection<OcflObjectVersionRefDto> versions) throws OcflObjectVersionNotFoundException {

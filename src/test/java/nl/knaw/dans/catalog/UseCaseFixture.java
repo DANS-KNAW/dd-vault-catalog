@@ -17,17 +17,23 @@ package nl.knaw.dans.catalog;
 
 import nl.knaw.dans.catalog.core.SearchIndex;
 import nl.knaw.dans.catalog.core.UseCases;
-import nl.knaw.dans.catalog.db.OcflObjectVersionDAO;
-import nl.knaw.dans.catalog.db.TarDAO;
+import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
+import nl.knaw.dans.catalog.core.mappers.TarMapper;
+import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
+import nl.knaw.dans.catalog.db.TarDao;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 
 public class UseCaseFixture {
-    public static final OcflObjectVersionDAO ocflObjectVersionDao = Mockito.mock(OcflObjectVersionDAO.class);
-    public static final TarDAO tarDao = Mockito.mock(TarDAO.class);
+    public static final OcflObjectVersionDao ocflObjectVersionDao = Mockito.mock(OcflObjectVersionDao.class);
+    public static final TarDao tarDao = Mockito.mock(TarDao.class);
     public static final SearchIndex searchIndex = Mockito.mock(SearchIndex.class);
+
     public static final UseCases useCases = new UseCases(
         ocflObjectVersionDao,
         tarDao,
+        Mappers.getMapper(OcflObjectVersionMapper.class),
+        Mappers.getMapper(TarMapper.class),
         searchIndex
     );
 

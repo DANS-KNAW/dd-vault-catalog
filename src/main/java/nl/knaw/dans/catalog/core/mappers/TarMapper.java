@@ -13,12 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.catalog.core.domain;
+package nl.knaw.dans.catalog.core.mappers;
 
-import lombok.Value;
+import nl.knaw.dans.catalog.api.TarParameterDto;
+import nl.knaw.dans.catalog.api.TarPartParameterDto;
+import nl.knaw.dans.catalog.core.Tar;
+import nl.knaw.dans.catalog.core.TarPart;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Value
-public class OcflObjectVersionId {
-    String bagId;
-    int objectVersion;
+import java.util.UUID;
+
+@Mapper
+public interface TarMapper {
+
+    TarMapper INSTANCE = Mappers.getMapper(TarMapper.class);
+
+    Tar convert(TarParameterDto parameters);
+
+    TarPart convert(TarPartParameterDto parameters);
+
+    default String mapTarUuid(UUID uuid) {
+        return uuid.toString();
+    }
+
 }

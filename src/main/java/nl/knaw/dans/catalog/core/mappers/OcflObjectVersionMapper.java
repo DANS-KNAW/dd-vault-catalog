@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.catalog.db.mappers;
+package nl.knaw.dans.catalog.core.mappers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
-import nl.knaw.dans.catalog.core.domain.OcflObjectVersionParameters;
-import nl.knaw.dans.catalog.db.OcflObjectVersion;
+import nl.knaw.dans.catalog.core.OcflObjectVersion;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Mapper
 public interface OcflObjectVersionMapper {
@@ -31,9 +34,25 @@ public interface OcflObjectVersionMapper {
 
     OcflObjectVersionMapper INSTANCE = Mappers.getMapper(OcflObjectVersionMapper.class);
 
-    OcflObjectVersion convert(OcflObjectVersionParameters parameters);
-
     OcflObjectVersion convert(OcflObjectVersionParametersDto parameters);
+
+    @Mapping(source = "tar.tarUuid", target = "tarUuid")
+    OcflObjectVersionDto convert(OcflObjectVersion version) ;
+
+    default UUID mapUuid(String value) {
+        if (value == null) {
+            return null;
+        }
+        return UUID.fromString(value);
+    }
+
+    default String mapDefaultObject(Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.toString();
+    }
 
     default String mapMetadata(Map<String, Object> value) throws JsonProcessingException {
         if (value == null) {
@@ -41,5 +60,18 @@ public interface OcflObjectVersionMapper {
         }
 
         return OBJECT_MAPPER.writeValueAsString(value);
+    }
+    default Map<String, Object> mapMetadata(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        try {
+            return OBJECT_MAPPER.readValue(value, new TypeReference<>() {
+            });
+        }
+        catch (JsonProcessingException e) {
+            throw new RuntimeException(String.format("Unable to parse JSON: %s", value), e);
+        }
     }
 }

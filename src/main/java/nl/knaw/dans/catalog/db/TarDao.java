@@ -16,6 +16,8 @@
 package nl.knaw.dans.catalog.db;
 
 import io.dropwizard.hibernate.AbstractDAO;
+import nl.knaw.dans.catalog.core.Tar;
+import nl.knaw.dans.catalog.core.TarPart;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 
@@ -23,8 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class TarDAO extends AbstractDAO<Tar>  {
-    public TarDAO(SessionFactory sessionFactory) {
+public class TarDao extends AbstractDAO<Tar>  {
+    public TarDao(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 

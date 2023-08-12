@@ -208,11 +208,6 @@
                             <apiPackage>nl.knaw.dans.catalog.resources</apiPackage>
                             <modelPackage>nl.knaw.dans.catalog.api</modelPackage>
                             <invokerPackage>nl.knaw.dans.catalog.resources</invokerPackage>
-                            <configOptions>
-                                <additionalModelTypeAnnotations>
-                                    @lombok.Builder
-                                </additionalModelTypeAnnotations>
-                            </configOptions>
                         </configuration>
                     </execution>
                 </executions>

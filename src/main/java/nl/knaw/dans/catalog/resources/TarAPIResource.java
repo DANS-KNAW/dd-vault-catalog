@@ -72,7 +72,7 @@ public class TarAPIResource implements TarApi {
         log.info("Received existing TAR {}, ID is {}, storing in database", tarDto, id);
 
         try {
-            var result = useCases.updateTar(id.toString(), tarMapper.convert(tarDto));
+            var result = useCases.updateTar(id.toString(), tarDto);
             var response = tarMapper.convert(result);
 
             return Response.ok(response).build();

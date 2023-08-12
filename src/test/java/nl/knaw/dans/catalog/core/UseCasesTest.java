@@ -15,18 +15,16 @@
  */
 package nl.knaw.dans.catalog.core;
 
-import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
 import nl.knaw.dans.catalog.api.TarParameterDto;
-import nl.knaw.dans.catalog.core.domain.OcflObjectVersionId;
-import nl.knaw.dans.catalog.core.domain.TarParameters;
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarException;
 import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
-import nl.knaw.dans.catalog.db.OcflObjectVersion;
-import nl.knaw.dans.catalog.db.OcflObjectVersionDAO;
-import nl.knaw.dans.catalog.db.Tar;
-import nl.knaw.dans.catalog.db.TarDAO;
+import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
+import nl.knaw.dans.catalog.core.mappers.TarMapper;
+import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
+import nl.knaw.dans.catalog.db.TarDao;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -40,26 +38,25 @@ class UseCasesTest {
 
     @Test
     void createTar_should_throw_TarAlreadyExistsException_when_tar_already_exists() {
-        var ocflObjectRepo = Mockito.mock(OcflObjectVersionDAO.class);
-        var tarRepo = Mockito.mock(TarDAO.class);
+        var ocflObjectRepo = Mockito.mock(OcflObjectVersionDao.class);
+        var tarRepo = Mockito.mock(TarDao.class);
         var searchIndex = Mockito.mock(SearchIndex.class);
-        var usecases = new UseCases(ocflObjectRepo, tarRepo, searchIndex);
+        var usecases = new UseCases(ocflObjectRepo, tarRepo, Mappers.getMapper(OcflObjectVersionMapper.class), Mappers.getMapper(TarMapper.class), searchIndex);
 
         Mockito.doReturn(Optional.of(Tar.builder().tarUuid("fake-id").build()))
             .when(tarRepo).getTarById(Mockito.eq("fake-id"));
 
-        assertThrows(TarAlreadyExistsException.class, () -> usecases.createTar("fake-id", TarParameters.builder()
-            .vaultPath("path/1")
-            .build())
+        assertThrows(TarAlreadyExistsException.class, () -> usecases.createTar("fake-id", new TarParameterDto()
+            .vaultPath("path/1"))
         );
     }
 
     @Test
     void createTar_should_throw_OcflObjectVersionAlreadyInTarException_if_versions_belong_to_another_tar() throws Exception {
-        var ocflObjectRepo = Mockito.mock(OcflObjectVersionDAO.class);
-        var tarRepo = Mockito.mock(TarDAO.class);
+        var ocflObjectRepo = Mockito.mock(OcflObjectVersionDao.class);
+        var tarRepo = Mockito.mock(TarDao.class);
         var searchIndex = Mockito.mock(SearchIndex.class);
-        var usecases = new UseCases(ocflObjectRepo, tarRepo, searchIndex);
+        var usecases = new UseCases(ocflObjectRepo, tarRepo, Mappers.getMapper(OcflObjectVersionMapper.class), Mappers.getMapper(TarMapper.class), searchIndex);
 
         var ocflObjectVersion = OcflObjectVersion.builder()
             .bagId("bagid")
@@ -71,20 +68,19 @@ class UseCasesTest {
             .when(ocflObjectRepo).findAll(Mockito.any());
 
         assertThrows(OcflObjectVersionAlreadyInTarException.class, () ->
-            usecases.createTar("fake-id", TarParameterDto
+            usecases.createTar("fake-id", new TarParameterDto()
                 .vaultPath("path/1")
-                .ocflObjectVersions(List.of(OcflObjectVersionRefDto.builder().bagId("bagid").objectVersion(1).build()))
-                .build()
+                .ocflObjectVersions(List.of(new OcflObjectVersionRefDto().bagId("bagid").objectVersion(1)))
             )
         );
     }
 
     @Test
     void updateTar_should_not_throw_OcflObjectVersionAlreadyInTarException_if_version_belongs_to_same_tar() throws Exception {
-        var ocflObjectRepo = Mockito.mock(OcflObjectVersionDAO.class);
-        var tarRepo = Mockito.mock(TarDAO.class);
+        var ocflObjectRepo = Mockito.mock(OcflObjectVersionDao.class);
+        var tarRepo = Mockito.mock(TarDao.class);
         var searchIndex = Mockito.mock(SearchIndex.class);
-        var usecases = new UseCases(ocflObjectRepo, tarRepo, searchIndex);
+        var usecases = new UseCases(ocflObjectRepo, tarRepo, Mappers.getMapper(OcflObjectVersionMapper.class), Mappers.getMapper(TarMapper.class), searchIndex);
         var tar = Tar.builder().tarUuid("fake-id").tarParts(new ArrayList<>()).build();
 
         var ocflObjectVersion = OcflObjectVersion.builder()
@@ -100,11 +96,10 @@ class UseCasesTest {
             .when(ocflObjectRepo).findAll(Mockito.any());
 
         assertDoesNotThrow(() ->
-            usecases.updateTar("fake-id", TarParameters.builder()
+            usecases.updateTar("fake-id", new TarParameterDto()
                 .vaultPath("path/1")
                 .tarParts(new ArrayList<>())
-                .versions(List.of(new OcflObjectVersionId("bagid", 1)))
-                .build()
+                .ocflObjectVersions(List.of(new OcflObjectVersionRefDto().bagId("bagid").objectVersion(1)))
             )
         );
     }
