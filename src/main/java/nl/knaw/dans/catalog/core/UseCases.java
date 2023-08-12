@@ -26,10 +26,10 @@ import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarExceptio
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionNotFoundException;
 import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
 import nl.knaw.dans.catalog.core.exception.TarNotFoundException;
-import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
-import nl.knaw.dans.catalog.db.TarDao;
 import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
 import nl.knaw.dans.catalog.core.mappers.TarMapper;
+import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
+import nl.knaw.dans.catalog.db.TarDao;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,18 +53,20 @@ public class UseCases {
         this.searchIndex = searchIndex;
     }
 
+
     @UnitOfWork
-    public Collection<OcflObjectVersion> findOcflObjectVersionsByBagId(String bagId) {
-        return ocflObjectVersionDao.findAllByBagId(bagId);
+    public Collection<OcflObjectVersionDto> findOcflObjectVersionsByBagId(String bagId) {
+        return ocflObjectVersionDao.findAllByBagId(bagId).stream().map(ocflObjectVersionMapper::convert).collect(Collectors.toList());
     }
 
     @UnitOfWork
-    public Collection<OcflObjectVersion> findOcflObjectVersionsBySwordToken(String swordToken) {
-        return ocflObjectVersionDao.findAllBySwordToken(swordToken);
+    public Collection<OcflObjectVersionDto> findOcflObjectVersionsBySwordToken(String swordToken) {
+        return ocflObjectVersionDao.findAllBySwordToken(swordToken).stream().map(ocflObjectVersionMapper::convert).collect(Collectors.toList());
     }
 
+
     @UnitOfWork
-    public List<OcflObjectVersion> findOcflObjectVersionsByNbn(String nbn) throws OcflObjectVersionNotFoundException {
+    public List<OcflObjectVersionDto> findOcflObjectVersionsByNbn(String nbn) throws OcflObjectVersionNotFoundException {
         var results = ocflObjectVersionDao.findByNbn(nbn);
 
         log.info("Found {} OCFL object versions for NBN {}", results.size(), nbn);
@@ -75,13 +77,14 @@ public class UseCases {
             );
         }
 
-        return results;
+        return results.stream().map(ocflObjectVersionMapper::convert).collect(Collectors.toList());
     }
 
     @UnitOfWork
-    public Optional<OcflObjectVersion> findOcflObjectVersionByBagIdAndVersion(String bagId, Integer versionNumber) {
-        return ocflObjectVersionDao.findByBagIdAndVersion(bagId, versionNumber);
+    public Optional<OcflObjectVersionDto> findOcflObjectVersionByBagIdAndVersion(String bagId, Integer versionNumber) {
+        return ocflObjectVersionDao.findByBagIdAndVersion(bagId, versionNumber).map(ocflObjectVersionMapper::convert);
     }
+
 
     @UnitOfWork
     public OcflObjectVersionDto createOcflObjectVersion(OcflObjectVersionRefDto id, OcflObjectVersionParametersDto parameters) throws OcflObjectVersionAlreadyExistsException {

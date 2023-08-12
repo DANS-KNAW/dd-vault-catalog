@@ -23,7 +23,6 @@ import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
 import nl.knaw.dans.catalog.core.OcflObjectVersion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Map;
 import java.util.UUID;
@@ -32,12 +31,10 @@ import java.util.UUID;
 public interface OcflObjectVersionMapper {
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    OcflObjectVersionMapper INSTANCE = Mappers.getMapper(OcflObjectVersionMapper.class);
-
     OcflObjectVersion convert(OcflObjectVersionParametersDto parameters);
 
     @Mapping(source = "tar.tarUuid", target = "tarUuid")
-    OcflObjectVersionDto convert(OcflObjectVersion version) ;
+    OcflObjectVersionDto convert(OcflObjectVersion version);
 
     default UUID mapUuid(String value) {
         if (value == null) {
@@ -45,6 +42,14 @@ public interface OcflObjectVersionMapper {
         }
         return UUID.fromString(value);
     }
+
+    default String mapUuid(UUID value) {
+        if (value == null) {
+            return null;
+        }
+        return value.toString();
+    }
+
 
     default String mapDefaultObject(Object value) {
         if (value == null) {
@@ -61,6 +66,7 @@ public interface OcflObjectVersionMapper {
 
         return OBJECT_MAPPER.writeValueAsString(value);
     }
+
     default Map<String, Object> mapMetadata(String value) {
         if (value == null) {
             return null;
@@ -68,6 +74,7 @@ public interface OcflObjectVersionMapper {
 
         try {
             return OBJECT_MAPPER.readValue(value, new TypeReference<>() {
+
             });
         }
         catch (JsonProcessingException e) {

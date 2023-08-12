@@ -52,7 +52,7 @@ class ArchiveDetailResourceTest {
     @Test
     void getOK() {
         var tar = Tar.builder()
-            .tarUuid("uuid")
+            .tarUuid("7905c66e-3a91-487b-baa4-afae5d123e59")
             .vaultPath("path")
             .archivalTimestamp(OffsetDateTime.now())
             .build();
@@ -61,7 +61,7 @@ class ArchiveDetailResourceTest {
             .bagId("bagid")
             .objectVersion(2)
             .otherId("OTHER ID")
-            .nbn("urn:uuid:123")
+            .nbn("urn:uuid:f6626f32-b026-4dcf-85da-1ec03b148dfc")
             .tar(tar)
             .build();
 
@@ -69,14 +69,14 @@ class ArchiveDetailResourceTest {
             .bagId("bagid")
             .objectVersion(1)
             .otherId("OTHER ID DIFFERENT")
-            .nbn("urn:uuid:123")
+            .nbn("urn:uuid:f6626f32-b026-4dcf-85da-1ec03b148dfc")
             .tar(tar)
             .build();
 
         Mockito.when(UseCaseFixture.ocflObjectVersionDao.findByNbn(Mockito.any()))
             .thenReturn(List.of(ocflObjectVersion1, ocflObjectVersion2));
 
-        var response = EXT.target("/nbn/urn:uuid:123")
+        var response = EXT.target("/nbn/urn:uuid:7905c66e-3a91-487b-baa4-afae5d123e59")
             .request()
             .accept(MediaType.TEXT_HTML_TYPE)
             .get(Response.class);

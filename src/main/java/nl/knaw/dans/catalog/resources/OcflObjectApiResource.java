@@ -20,16 +20,12 @@ import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
 import nl.knaw.dans.catalog.core.UseCases;
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyExistsException;
-import nl.knaw.dans.catalog.resources.mappers.OcflObjectVersionMapper;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class OcflObjectApiResource implements OcflObjectApi {
-    private final OcflObjectVersionMapper ocflObjectVersionMapper = OcflObjectVersionMapper.INSTANCE;
-
     private final UseCases useCases;
 
     public OcflObjectApiResource(UseCases useCases) {
@@ -55,7 +51,6 @@ public class OcflObjectApiResource implements OcflObjectApi {
     @Override
     public Response getOcflObjectByBagIdAndVersionNumber(String bagId, Integer versionNumber) {
         var result = useCases.findOcflObjectVersionByBagIdAndVersion(bagId, versionNumber)
-            .map(ocflObjectVersionMapper::convert)
             .orElseThrow(() -> new WebApplicationException(
                 String.format("No ocfl object version found for bagId %s and version %d", bagId, versionNumber),
                 Response.Status.NOT_FOUND
@@ -66,21 +61,11 @@ public class OcflObjectApiResource implements OcflObjectApi {
 
     @Override
     public Response getOcflObjectsByBagId(String bagId) {
-        var results = useCases.findOcflObjectVersionsByBagId(bagId)
-            .stream()
-            .map(ocflObjectVersionMapper::convert)
-            .collect(Collectors.toList());
-
-        return Response.ok(results).build();
+        return Response.ok(useCases.findOcflObjectVersionsByBagId(bagId)).build();
     }
 
     @Override
     public Response getOcflObjectsBySwordToken(String swordToken) {
-        var results = useCases.findOcflObjectVersionsBySwordToken(swordToken)
-            .stream()
-            .map(ocflObjectVersionMapper::convert)
-            .collect(Collectors.toList());
-
-        return Response.ok(results).build();
+        return Response.ok(useCases.findOcflObjectVersionsBySwordToken(swordToken)).build();
     }
 }

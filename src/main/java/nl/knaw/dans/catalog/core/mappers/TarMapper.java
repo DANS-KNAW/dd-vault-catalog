@@ -20,15 +20,11 @@ import nl.knaw.dans.catalog.api.TarPartParameterDto;
 import nl.knaw.dans.catalog.core.Tar;
 import nl.knaw.dans.catalog.core.TarPart;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import java.util.UUID;
 
 @Mapper
 public interface TarMapper {
-
-    TarMapper INSTANCE = Mappers.getMapper(TarMapper.class);
-
     Tar convert(TarParameterDto parameters);
 
     TarPart convert(TarPartParameterDto parameters);
@@ -36,5 +32,4 @@ public interface TarMapper {
     default String mapTarUuid(UUID uuid) {
         return uuid.toString();
     }
-
 }
