@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.catalog.resource.view;
+package nl.knaw.dans.catalog.resources;
 
 import io.dropwizard.views.View;
 import nl.knaw.dans.catalog.db.OcflObjectVersion;

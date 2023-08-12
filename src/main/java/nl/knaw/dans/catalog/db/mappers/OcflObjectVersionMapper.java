@@ -17,6 +17,7 @@ package nl.knaw.dans.catalog.db.mappers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
 import nl.knaw.dans.catalog.core.domain.OcflObjectVersionParameters;
 import nl.knaw.dans.catalog.db.OcflObjectVersion;
 import org.mapstruct.Mapper;
@@ -31,6 +32,8 @@ public interface OcflObjectVersionMapper {
     OcflObjectVersionMapper INSTANCE = Mappers.getMapper(OcflObjectVersionMapper.class);
 
     OcflObjectVersion convert(OcflObjectVersionParameters parameters);
+
+    OcflObjectVersion convert(OcflObjectVersionParametersDto parameters);
 
     default String mapMetadata(Map<String, Object> value) throws JsonProcessingException {
         if (value == null) {

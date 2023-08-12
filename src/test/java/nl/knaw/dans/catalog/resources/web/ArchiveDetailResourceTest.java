@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.catalog.resource.web;
+package nl.knaw.dans.catalog.resources.web;
 
 import com.codahale.metrics.MetricRegistry;
 import freemarker.template.Configuration;
@@ -24,6 +24,7 @@ import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import nl.knaw.dans.catalog.UseCaseFixture;
 import nl.knaw.dans.catalog.db.OcflObjectVersion;
 import nl.knaw.dans.catalog.db.Tar;
+import nl.knaw.dans.catalog.resources.ArchiveDetailResource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,7 +73,7 @@ class ArchiveDetailResourceTest {
             .tar(tar)
             .build();
 
-        Mockito.when(UseCaseFixture.ocflObjectVersionRepository.findByNbn(Mockito.any()))
+        Mockito.when(UseCaseFixture.ocflObjectVersionDao.findByNbn(Mockito.any()))
             .thenReturn(List.of(ocflObjectVersion1, ocflObjectVersion2));
 
         var response = EXT.target("/nbn/urn:uuid:123")
@@ -85,7 +86,7 @@ class ArchiveDetailResourceTest {
 
     @Test
     void getMissingNBN() {
-        Mockito.when(UseCaseFixture.ocflObjectVersionRepository.findByNbn(Mockito.any()))
+        Mockito.when(UseCaseFixture.ocflObjectVersionDao.findByNbn(Mockito.any()))
             .thenReturn(List.of());
 
         var response = EXT.target("/nbn/urn:uuid:123")

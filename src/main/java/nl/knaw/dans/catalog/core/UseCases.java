@@ -17,12 +17,21 @@ package nl.knaw.dans.catalog.core;
 
 import io.dropwizard.hibernate.UnitOfWork;
 import lombok.extern.slf4j.Slf4j;
+import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
+import nl.knaw.dans.catalog.api.TarDto;
+import nl.knaw.dans.catalog.api.TarParameterDto;
 import nl.knaw.dans.catalog.core.domain.OcflObjectVersionId;
 import nl.knaw.dans.catalog.core.domain.OcflObjectVersionParameters;
 import nl.knaw.dans.catalog.core.domain.TarParameters;
-import nl.knaw.dans.catalog.core.exception.*;
+import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyExistsException;
+import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarException;
+import nl.knaw.dans.catalog.core.exception.OcflObjectVersionNotFoundException;
+import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
+import nl.knaw.dans.catalog.core.exception.TarNotFoundException;
 import nl.knaw.dans.catalog.db.OcflObjectVersion;
+import nl.knaw.dans.catalog.db.OcflObjectVersionDAO;
 import nl.knaw.dans.catalog.db.Tar;
+import nl.knaw.dans.catalog.db.TarDAO;
 import nl.knaw.dans.catalog.db.mappers.OcflObjectVersionMapper;
 import nl.knaw.dans.catalog.db.mappers.TarMapper;
 
@@ -33,32 +42,32 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class UseCases {
-    private final OcflObjectVersionRepository ocflObjectVersionRepository;
-    private final TarRepository tarRepository;
+    private final OcflObjectVersionDAO ocflObjectVersionDao;
+    private final TarDAO tarDao;
     private final SearchIndex searchIndex;
 
     private final TarMapper tarMapper = TarMapper.INSTANCE;
     private final OcflObjectVersionMapper ocflObjectVersionMapper = OcflObjectVersionMapper.INSTANCE;
 
-    public UseCases(OcflObjectVersionRepository ocflObjectVersionRepository, TarRepository tarRepository, SearchIndex searchIndex) {
-        this.ocflObjectVersionRepository = ocflObjectVersionRepository;
-        this.tarRepository = tarRepository;
+    public UseCases(OcflObjectVersionDAO ocflObjectVersionDao, TarDAO tarDao, SearchIndex searchIndex) {
+        this.ocflObjectVersionDao = ocflObjectVersionDao;
+        this.tarDao = tarDao;
         this.searchIndex = searchIndex;
     }
 
     @UnitOfWork
     public Collection<OcflObjectVersion> findOcflObjectVersionsByBagId(String bagId) {
-        return ocflObjectVersionRepository.findAllByBagId(bagId);
+        return ocflObjectVersionDao.findAllByBagId(bagId);
     }
 
     @UnitOfWork
     public Collection<OcflObjectVersion> findOcflObjectVersionsBySwordToken(String swordToken) {
-        return ocflObjectVersionRepository.findAllBySwordToken(swordToken);
+        return ocflObjectVersionDao.findAllBySwordToken(swordToken);
     }
 
     @UnitOfWork
     public List<OcflObjectVersion> findOcflObjectVersionsByNbn(String nbn) throws OcflObjectVersionNotFoundException {
-        var results = ocflObjectVersionRepository.findByNbn(nbn);
+        var results = ocflObjectVersionDao.findByNbn(nbn);
 
         log.info("Found {} OCFL object versions for NBN {}", results.size(), nbn);
 
@@ -73,17 +82,17 @@ public class UseCases {
 
     @UnitOfWork
     public Optional<OcflObjectVersion> findOcflObjectVersionByBagIdAndVersion(String bagId, Integer versionNumber) {
-        return ocflObjectVersionRepository.findByBagIdAndVersion(bagId, versionNumber);
+        return ocflObjectVersionDao.findByBagIdAndVersion(bagId, versionNumber);
     }
 
     @UnitOfWork
-    public OcflObjectVersion createOcflObjectVersion(OcflObjectVersionId id, OcflObjectVersionParameters parameters) throws OcflObjectVersionAlreadyExistsException {
+    public OcflObjectVersion createOcflObjectVersion(OcflObjectVersionId id, OcflObjectVersionParametersDto parameters) throws OcflObjectVersionAlreadyExistsException {
         var ocflObjectVersion = ocflObjectVersionMapper.convert(parameters);
         ocflObjectVersion.setObjectVersion(id.getObjectVersion());
         ocflObjectVersion.setBagId(id.getBagId());
 
         log.info("Creating new OCFL object version with bagId {} and version {}: {}", id.getBagId(), id.getObjectVersion(), ocflObjectVersion);
-        ocflObjectVersionRepository.save(ocflObjectVersion);
+        ocflObjectVersionDao.save(ocflObjectVersion);
 
         log.info("Indexing OCFL object version in search index: {}", ocflObjectVersion.getId());
         searchIndex.indexOcflObjectVersion(ocflObjectVersion);
@@ -93,7 +102,7 @@ public class UseCases {
 
     @UnitOfWork
     public Tar createTar(String id, TarParameters params) throws TarAlreadyExistsException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
-        var existingTar = tarRepository.getTarById(id);
+        var existingTar = tarDao.getTarById(id);
 
         if (existingTar.isPresent()) {
             log.debug("Found existing tar with id {}: {}", id, existingTar.get());
@@ -101,7 +110,7 @@ public class UseCases {
         }
 
         // throws exception if one cannot be found
-        var ocflObjectVersions = ocflObjectVersionRepository.findAll(params.getVersions());
+        var ocflObjectVersions = ocflObjectVersionDao.findAll(params.getVersions(), true);
 
         // check if all ocfl object versions are not already in a tar
         for (var version : ocflObjectVersions) {
@@ -120,7 +129,7 @@ public class UseCases {
         tar.setOcflObjectVersions(ocflObjectVersions);
 
         log.info("Saving new TAR {}", tar);
-        var result = tarRepository.save(tar);
+        var result = tarDao.save(tar);
 
         log.info("Indexing TAR in search index: {}", tar);
         searchIndex.indexTar(result);
@@ -129,19 +138,57 @@ public class UseCases {
     }
 
     @UnitOfWork
+    public Tar createTar(String id, TarParameterDto params) throws TarAlreadyExistsException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
+        var existingTar = tarDao.getTarById(id);
+
+        if (existingTar.isPresent()) {
+            log.debug("Found existing tar with id {}: {}", id, existingTar.get());
+            throw new TarAlreadyExistsException(id);
+        }
+
+        // throws exception if one cannot be found
+        var ocflObjectVersions = ocflObjectVersionDao.findAll(params.getOcflObjectVersions());
+
+        // check if all ocfl object versions are not already in a tar
+        for (var version : ocflObjectVersions) {
+            if (version.getTar() != null) {
+                throw new OcflObjectVersionAlreadyInTarException(String.format(
+                    "OcflObjectVersion with bagId %s and version %d is already in TAR %s",
+                    version.getId().getBagId(), version.getId().getObjectVersion(), version.getTar().getTarUuid()
+                ));
+            }
+        }
+
+        log.info("Successfully found all OCFL object versions for TAR {}", id);
+
+        var tar = tarMapper.convert(params);
+        tar.setTarUuid(id);
+        tar.setOcflObjectVersions(ocflObjectVersions);
+
+        log.info("Saving new TAR {}", tar);
+        var result = tarDao.save(tar);
+
+        log.info("Indexing TAR in search index: {}", tar);
+        searchIndex.indexTar(result);
+
+        return result;
+    }
+
+
+    @UnitOfWork
     public Optional<Tar> findTarById(String id) {
-        return tarRepository.getTarById(id);
+        return tarDao.getTarById(id);
     }
 
     @UnitOfWork
     public Tar updateTar(String id, TarParameters params) throws TarNotFoundException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
-        var tar = tarRepository.getTarById(id)
+        var tar = tarDao.getTarById(id)
             .orElseThrow(() -> new TarNotFoundException(
                 String.format("Tar with id %s not found", id)
             ));
 
         log.info("Found existing tar with id {}: {}", id, tar);
-        var ocflObjectVersions = ocflObjectVersionRepository.findAll(params.getVersions());
+        var ocflObjectVersions = ocflObjectVersionDao.findAll(params.getVersions(), true);
 
         // check if all ocfl object versions are not already in a tar
         for (var version : ocflObjectVersions) {
@@ -160,7 +207,7 @@ public class UseCases {
         tar.setOcflObjectVersions(ocflObjectVersions);
 
         log.info("Updating TAR {}", tar);
-        var result = tarRepository.save(tar);
+        var result = tarDao.save(tar);
 
         log.info("Reindexing TAR in search index: {}", tar);
         searchIndex.indexTar(result);
@@ -171,7 +218,7 @@ public class UseCases {
 
     @UnitOfWork
     public void reindexAllTars() {
-        var tars = tarRepository.findAll();
+        var tars = tarDao.findAll();
 
         log.info("Reindexing {} archives", tars.size());
 

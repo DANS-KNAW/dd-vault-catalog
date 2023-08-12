@@ -26,11 +26,11 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.View;
 import io.dropwizard.views.ViewBundle;
 import nl.knaw.dans.catalog.cli.ReindexCommand;
-import nl.knaw.dans.catalog.resource.api.DefaultApiResource;
-import nl.knaw.dans.catalog.resource.api.OcflObjectApiResource;
-import nl.knaw.dans.catalog.resource.api.TarAPIResource;
-import nl.knaw.dans.catalog.resource.view.ErrorView;
-import nl.knaw.dans.catalog.resource.web.ArchiveDetailResource;
+import nl.knaw.dans.catalog.resources.ArchiveDetailResource;
+import nl.knaw.dans.catalog.resources.DefaultApiResource;
+import nl.knaw.dans.catalog.resources.ErrorView;
+import nl.knaw.dans.catalog.resources.OcflObjectApiResource;
+import nl.knaw.dans.catalog.resources.TarAPIResource;
 
 import javax.ws.rs.core.MediaType;
 

@@ -15,12 +15,15 @@
  */
 package nl.knaw.dans.catalog.db.mappers;
 
+import nl.knaw.dans.catalog.api.TarParameterDto;
 import nl.knaw.dans.catalog.core.domain.TarParameters;
 import nl.knaw.dans.catalog.core.domain.TarPartParameters;
 import nl.knaw.dans.catalog.db.Tar;
 import nl.knaw.dans.catalog.db.TarPart;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.UUID;
 
 @Mapper
 public interface TarMapper {
@@ -29,7 +32,12 @@ public interface TarMapper {
 
     Tar convert(TarParameters parameters);
 
+    Tar convert(TarParameterDto parameters);
+
     TarPart convert(TarPartParameters parameters);
 
+    default String mapTarUuid(UUID uuid) {
+        return uuid.toString();
+    }
 
 }

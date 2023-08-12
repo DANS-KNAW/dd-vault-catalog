@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.catalog.resource.api;
+package nl.knaw.dans.catalog.resources.api;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.testing.DropwizardTestSupport;

@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.catalog.core;
 
-import nl.knaw.dans.catalog.db.Tar;
+package nl.knaw.dans.catalog.resources;
 
-import java.util.List;
-import java.util.Optional;
+import io.dropwizard.jersey.errors.ErrorMessage;
+import io.dropwizard.views.View;
 
-public interface TarRepository {
+public class ErrorView extends View {
+    private final ErrorMessage errorMessage;
 
-    Optional<Tar> getTarById(String id);
+    public ErrorView(ErrorMessage errorMessage) {
+        super("error.ftl");
+        this.errorMessage = errorMessage;
+    }
 
-    Tar save(Tar tar);
+    public ErrorMessage getErrorMessage() {
+        return errorMessage;
+    }
 
-    List<Tar> findAll();
 }

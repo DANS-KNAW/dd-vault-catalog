@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.catalog.resource.api;
+package nl.knaw.dans.catalog.resources;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.catalog.api.TarParameterDto;
@@ -23,10 +23,8 @@ import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarExceptio
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionNotFoundException;
 import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
 import nl.knaw.dans.catalog.core.exception.TarNotFoundException;
-import nl.knaw.dans.catalog.resource.TarApi;
-import nl.knaw.dans.catalog.resource.mappers.TarMapper;
+import nl.knaw.dans.catalog.resources.mappers.TarMapper;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
@@ -45,7 +43,7 @@ public class TarAPIResource implements TarApi {
         log.info("Received new TAR {}, storing in database", tarDto);
 
         try {
-            var result = useCases.createTar(tarDto.getTarUuid().toString(), tarMapper.convert(tarDto));
+            var result = useCases.createTar(tarDto.getTarUuid().toString(), tarDto);
             var converted = tarMapper.convert(result);
             return Response.ok(converted).status(201).build();
         }
@@ -56,10 +54,6 @@ public class TarAPIResource implements TarApi {
         catch (OcflObjectVersionNotFoundException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(e.getMessage(), Response.Status.NOT_FOUND);
-        }
-        catch (Throwable e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 

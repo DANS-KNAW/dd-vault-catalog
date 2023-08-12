@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nl.knaw.dans.catalog.resources;
 
-package nl.knaw.dans.catalog.resource.view;
+import lombok.extern.slf4j.Slf4j;
 
-import io.dropwizard.jersey.errors.ErrorMessage;
-import io.dropwizard.views.View;
+import javax.ws.rs.core.Response;
 
-public class ErrorView extends View {
-    private final ErrorMessage errorMessage;
+@Slf4j
+public class DefaultApiResource implements DefaultApi {
 
-    public ErrorView(ErrorMessage errorMessage) {
-        super("error.ftl");
-        this.errorMessage = errorMessage;
+    @Override
+    public Response getInfo() {
+        // TODO figure out what the version means, and where to get it from
+        return Response.ok("DANS VAULT CATALOG SERVICE running v1.2.3").build();
     }
-
-    public ErrorMessage getErrorMessage() {
-        return errorMessage;
-    }
-
 }

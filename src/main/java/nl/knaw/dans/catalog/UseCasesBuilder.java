@@ -17,12 +17,10 @@ package nl.knaw.dans.catalog;
 
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.hibernate.UnitOfWorkAwareProxyFactory;
+import nl.knaw.dans.catalog.core.SearchIndex;
+import nl.knaw.dans.catalog.core.UseCases;
 import nl.knaw.dans.catalog.core.solr.OcflObjectMetadataReader;
 import nl.knaw.dans.catalog.core.solr.SolrIndex;
-import nl.knaw.dans.catalog.core.OcflObjectVersionRepository;
-import nl.knaw.dans.catalog.core.SearchIndex;
-import nl.knaw.dans.catalog.core.TarRepository;
-import nl.knaw.dans.catalog.core.UseCases;
 import nl.knaw.dans.catalog.db.OcflObjectVersionDAO;
 import nl.knaw.dans.catalog.db.TarDAO;
 
@@ -31,19 +29,19 @@ public class UseCasesBuilder {
     public static UseCases build(DdVaultCatalogConfiguration configuration, HibernateBundle<DdVaultCatalogConfiguration> hibernateBundle) {
         var ocflObjectMetadataReader = new OcflObjectMetadataReader();
         var searchIndex = new SolrIndex(configuration.getSolr(), ocflObjectMetadataReader);
-        var ocflObjectVersionRepository = new OcflObjectVersionDAO(hibernateBundle.getSessionFactory());
-        var tarRepository = new TarDAO(hibernateBundle.getSessionFactory());
+        var ocflObjectVersionDao = new OcflObjectVersionDAO(hibernateBundle.getSessionFactory());
+        var tarDao = new TarDAO(hibernateBundle.getSessionFactory());
 
         return new UnitOfWorkAwareProxyFactory(hibernateBundle)
             .create(UseCases.class,
                 new Class[]{
-                    OcflObjectVersionRepository.class,
-                    TarRepository.class,
+                    OcflObjectVersionDAO.class,
+                    TarDAO.class,
                     SearchIndex.class,
                 },
                 new Object[]{
-                    ocflObjectVersionRepository,
-                    tarRepository,
+                    ocflObjectVersionDao,
+                    tarDao,
                     searchIndex
                 }
             );
