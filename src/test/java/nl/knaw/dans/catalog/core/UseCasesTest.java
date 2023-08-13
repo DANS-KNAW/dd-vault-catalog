@@ -19,12 +19,9 @@ import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
 import nl.knaw.dans.catalog.api.TarParameterDto;
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarException;
 import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
-import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
-import nl.knaw.dans.catalog.core.mappers.TarMapper;
 import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
 import nl.knaw.dans.catalog.db.TarDao;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;

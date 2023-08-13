@@ -17,11 +17,8 @@ package nl.knaw.dans.catalog;
 
 import nl.knaw.dans.catalog.core.SearchIndex;
 import nl.knaw.dans.catalog.core.UseCases;
-import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
-import nl.knaw.dans.catalog.core.mappers.TarMapper;
 import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
 import nl.knaw.dans.catalog.db.TarDao;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 
 public class UseCaseFixture {

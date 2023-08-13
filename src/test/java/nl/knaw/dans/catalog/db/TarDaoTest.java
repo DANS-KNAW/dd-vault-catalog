@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 @Slf4j
-class TarRepositoryTest {
+class TarDaoTest {
     //
     private final DAOTestExtension daoTestRule = DAOTestExtension.newBuilder()
         .addEntityClass(Tar.class)

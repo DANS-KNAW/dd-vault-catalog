@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.knaw.dans.catalog.resources.api;
+package nl.knaw.dans.catalog.resources;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.testing.DropwizardTestSupport;
@@ -22,7 +22,12 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import nl.knaw.dans.catalog.DdVaultCatalogApplication;
 import nl.knaw.dans.catalog.DdVaultCatalogConfiguration;
-import nl.knaw.dans.catalog.api.*;
+import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
+import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
+import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
+import nl.knaw.dans.catalog.api.TarDto;
+import nl.knaw.dans.catalog.api.TarParameterDto;
+import nl.knaw.dans.catalog.api.TarPartParameterDto;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
-class TarAPIResourceIntegrationTest {
+class TarApiResourceIntegrationTest {
 
     public static final DropwizardTestSupport<DdVaultCatalogConfiguration> SUPPORT =
         new DropwizardTestSupport<>(DdVaultCatalogApplication.class,

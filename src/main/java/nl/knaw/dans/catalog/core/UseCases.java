@@ -28,8 +28,6 @@ import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarExceptio
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionNotFoundException;
 import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
 import nl.knaw.dans.catalog.core.exception.TarNotFoundException;
-import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
-import nl.knaw.dans.catalog.core.mappers.TarMapper;
 import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
 import nl.knaw.dans.catalog.db.TarDao;
 import org.mapstruct.factory.Mappers;

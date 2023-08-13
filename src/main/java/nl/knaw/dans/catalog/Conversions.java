@@ -33,6 +33,9 @@ import org.mapstruct.Mapping;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Conversion between DTOs and domain objects.
+ */
 @Mapper
 public interface Conversions {
 

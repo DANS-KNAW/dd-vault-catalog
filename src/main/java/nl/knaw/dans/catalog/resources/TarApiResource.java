@@ -23,18 +23,16 @@ import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarExceptio
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionNotFoundException;
 import nl.knaw.dans.catalog.core.exception.TarAlreadyExistsException;
 import nl.knaw.dans.catalog.core.exception.TarNotFoundException;
-import nl.knaw.dans.catalog.resources.mappers.TarMapper;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 @Slf4j
-public class TarAPIResource implements TarApi {
-    private final TarMapper tarMapper = TarMapper.INSTANCE;
+public class TarApiResource implements TarApi {
     private final UseCases useCases;
 
-    public TarAPIResource(UseCases useCases) {
+    public TarApiResource(UseCases useCases) {
         this.useCases = useCases;
     }
 
