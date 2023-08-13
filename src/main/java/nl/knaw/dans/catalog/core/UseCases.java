@@ -17,6 +17,7 @@ package nl.knaw.dans.catalog.core;
 
 import io.dropwizard.hibernate.UnitOfWork;
 import lombok.extern.slf4j.Slf4j;
+import nl.knaw.dans.catalog.Conversions;
 import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
@@ -31,6 +32,7 @@ import nl.knaw.dans.catalog.core.mappers.OcflObjectVersionMapper;
 import nl.knaw.dans.catalog.core.mappers.TarMapper;
 import nl.knaw.dans.catalog.db.OcflObjectVersionDao;
 import nl.knaw.dans.catalog.db.TarDao;
+import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,27 +44,23 @@ public class UseCases {
     private final OcflObjectVersionDao ocflObjectVersionDao;
     private final TarDao tarDao;
     private final SearchIndex searchIndex;
+    private final Conversions conversions = Mappers.getMapper(Conversions.class);
 
-    private final TarMapper tarMapper;
-    private final OcflObjectVersionMapper ocflObjectVersionMapper;
-
-    public UseCases(OcflObjectVersionDao ocflObjectVersionDao, TarDao tarDao, OcflObjectVersionMapper ocflObjectVersionMapper, TarMapper tarMapper, SearchIndex searchIndex) {
+    public UseCases(OcflObjectVersionDao ocflObjectVersionDao, TarDao tarDao, SearchIndex searchIndex) {
         this.ocflObjectVersionDao = ocflObjectVersionDao;
         this.tarDao = tarDao;
-        this.tarMapper = tarMapper;
-        this.ocflObjectVersionMapper = ocflObjectVersionMapper;
         this.searchIndex = searchIndex;
     }
 
 
     @UnitOfWork
     public Collection<OcflObjectVersionDto> findOcflObjectVersionsByBagId(String bagId) {
-        return ocflObjectVersionDao.findAllByBagId(bagId).stream().map(ocflObjectVersionMapper::convert).collect(Collectors.toList());
+        return ocflObjectVersionDao.findAllByBagId(bagId).stream().map(conversions::convert).collect(Collectors.toList());
     }
 
     @UnitOfWork
     public Collection<OcflObjectVersionDto> findOcflObjectVersionsBySwordToken(String swordToken) {
-        return ocflObjectVersionDao.findAllBySwordToken(swordToken).stream().map(ocflObjectVersionMapper::convert).collect(Collectors.toList());
+        return ocflObjectVersionDao.findAllBySwordToken(swordToken).stream().map(conversions::convert).collect(Collectors.toList());
     }
 
 
@@ -78,18 +76,18 @@ public class UseCases {
             );
         }
 
-        return results.stream().map(ocflObjectVersionMapper::convert).collect(Collectors.toList());
+        return results.stream().map(conversions::convert).collect(Collectors.toList());
     }
 
     @UnitOfWork
     public Optional<OcflObjectVersionDto> findOcflObjectVersionByBagIdAndVersion(String bagId, Integer versionNumber) {
-        return ocflObjectVersionDao.findByBagIdAndVersion(bagId, versionNumber).map(ocflObjectVersionMapper::convert);
+        return ocflObjectVersionDao.findByBagIdAndVersion(bagId, versionNumber).map(conversions::convert);
     }
 
 
     @UnitOfWork
     public OcflObjectVersionDto createOcflObjectVersion(OcflObjectVersionRefDto id, OcflObjectVersionParametersDto parameters) throws OcflObjectVersionAlreadyExistsException {
-        var ocflObjectVersion = ocflObjectVersionMapper.convert(parameters);
+        var ocflObjectVersion = conversions.convert(parameters);
         ocflObjectVersion.setObjectVersion(id.getObjectVersion());
         ocflObjectVersion.setBagId(id.getBagId());
 
@@ -99,7 +97,7 @@ public class UseCases {
         log.info("Indexing OCFL object version in search index: {}", ocflObjectVersion.getId());
         searchIndex.indexOcflObjectVersion(ocflObjectVersion);
 
-        return ocflObjectVersionMapper.convert(ocflObjectVersion);
+        return conversions.convert(ocflObjectVersion);
     }
 
     @UnitOfWork
@@ -126,7 +124,7 @@ public class UseCases {
 
         log.info("Successfully found all OCFL object versions for TAR {}", id);
 
-        var tar = tarMapper.convert(params);
+        var tar = conversions.convert(params);
         tar.setTarUuid(id);
         tar.setOcflObjectVersions(ocflObjectVersions);
 
@@ -137,16 +135,16 @@ public class UseCases {
         log.info("Indexing TAR in search index: {}", tar);
         searchIndex.indexTar(result);
 
-        return tarMapper.convert(result);
+        return conversions.convert(result);
     }
 
     @UnitOfWork
-    public Optional<Tar> findTarById(String id) {
-        return tarDao.getTarById(id);
+    public Optional<TarDto> findTarById(String id) {
+        return tarDao.getTarById(id).map(conversions::convert);
     }
 
     @UnitOfWork
-    public Tar updateTar(String id, TarParameterDto params) throws TarNotFoundException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
+    public TarDto updateTar(String id, TarParameterDto params) throws TarNotFoundException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
         var tar = tarDao.getTarById(id)
             .orElseThrow(() -> new TarNotFoundException(
                 String.format("Tar with id %s not found", id)
@@ -165,7 +163,7 @@ public class UseCases {
             }
         }
 
-        var parts = params.getTarParts().stream().map(tarMapper::convert).collect(Collectors.toList());
+        var parts = params.getTarParts().stream().map(conversions::convert).collect(Collectors.toList());
         tar.setArchivalTimestamp(params.getArchivalTimestamp());
         tar.setVaultPath(params.getVaultPath());
         tar.setTarParts(parts);
@@ -177,7 +175,7 @@ public class UseCases {
         log.info("Reindexing TAR in search index: {}", tar);
         searchIndex.indexTar(result);
 
-        return result;
+        return conversions.convert(result);
     }
 
     @UnitOfWork

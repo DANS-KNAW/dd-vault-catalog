@@ -95,15 +95,11 @@ public class DdVaultCatalogApplication extends Application<DdVaultCatalogConfigu
                 new Class[] {
                     OcflObjectVersionDao.class,
                     TarDao.class,
-                    OcflObjectVersionMapper.class,
-                    TarMapper.class,
                     SearchIndex.class,
                 },
                 new Object[] {
                     ocflObjectVersionDao,
                     tarDao,
-                    ocflObjectVersionMapper,
-                    tarMapper,
                     searchIndex
                 }
             );

@@ -41,7 +41,7 @@ class UseCasesTest {
         var ocflObjectRepo = Mockito.mock(OcflObjectVersionDao.class);
         var tarRepo = Mockito.mock(TarDao.class);
         var searchIndex = Mockito.mock(SearchIndex.class);
-        var usecases = new UseCases(ocflObjectRepo, tarRepo, Mappers.getMapper(OcflObjectVersionMapper.class), Mappers.getMapper(TarMapper.class), searchIndex);
+        var usecases = new UseCases(ocflObjectRepo, tarRepo, searchIndex);
 
         Mockito.doReturn(Optional.of(Tar.builder().tarUuid("fake-id").build()))
             .when(tarRepo).getTarById(Mockito.eq("fake-id"));
@@ -56,7 +56,7 @@ class UseCasesTest {
         var ocflObjectRepo = Mockito.mock(OcflObjectVersionDao.class);
         var tarRepo = Mockito.mock(TarDao.class);
         var searchIndex = Mockito.mock(SearchIndex.class);
-        var usecases = new UseCases(ocflObjectRepo, tarRepo, Mappers.getMapper(OcflObjectVersionMapper.class), Mappers.getMapper(TarMapper.class), searchIndex);
+        var usecases = new UseCases(ocflObjectRepo, tarRepo, searchIndex);
 
         var ocflObjectVersion = OcflObjectVersion.builder()
             .bagId("bagid")
@@ -80,7 +80,7 @@ class UseCasesTest {
         var ocflObjectRepo = Mockito.mock(OcflObjectVersionDao.class);
         var tarRepo = Mockito.mock(TarDao.class);
         var searchIndex = Mockito.mock(SearchIndex.class);
-        var usecases = new UseCases(ocflObjectRepo, tarRepo, Mappers.getMapper(OcflObjectVersionMapper.class), Mappers.getMapper(TarMapper.class), searchIndex);
+        var usecases = new UseCases(ocflObjectRepo, tarRepo, searchIndex);
         var tar = Tar.builder().tarUuid("fake-id").tarParts(new ArrayList<>()).build();
 
         var ocflObjectVersion = OcflObjectVersion.builder()

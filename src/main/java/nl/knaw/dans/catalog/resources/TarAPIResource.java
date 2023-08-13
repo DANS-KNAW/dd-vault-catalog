@@ -59,7 +59,6 @@ public class TarAPIResource implements TarApi {
     public Response getArchiveById(UUID id) {
         log.debug("Fetching TAR with id {}", id);
         var result = useCases.findTarById(id.toString())
-            .map(tarMapper::convert)
             .orElseThrow(() -> new WebApplicationException(Response.Status.NOT_FOUND));
 
         return Response.ok(result).build();
@@ -70,10 +69,7 @@ public class TarAPIResource implements TarApi {
         log.info("Received existing TAR {}, ID is {}, storing in database", tarDto, id);
 
         try {
-            var result = useCases.updateTar(id.toString(), tarDto);
-            var response = tarMapper.convert(result);
-
-            return Response.ok(response).build();
+            return Response.ok(useCases.updateTar(id.toString(), tarDto)).build();
         }
         catch (OcflObjectVersionAlreadyInTarException e) {
             log.error(e.getMessage());

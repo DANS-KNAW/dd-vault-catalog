@@ -18,10 +18,12 @@ package nl.knaw.dans.catalog.core.mappers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
 import nl.knaw.dans.catalog.api.TarDto;
 import nl.knaw.dans.catalog.api.TarParameterDto;
 import nl.knaw.dans.catalog.api.TarPartDto;
 import nl.knaw.dans.catalog.api.TarPartParameterDto;
+import nl.knaw.dans.catalog.core.OcflObjectVersion;
 import nl.knaw.dans.catalog.core.Tar;
 import nl.knaw.dans.catalog.core.TarPart;
 import org.mapstruct.Mapper;
@@ -76,4 +78,8 @@ public interface TarMapper {
         }
         return UUID.fromString(value);
     }
+
+    @Mapping(target = "tarUuid", source = "tar.tarUuid")
+    OcflObjectVersionDto convert(OcflObjectVersion version);
+
 }

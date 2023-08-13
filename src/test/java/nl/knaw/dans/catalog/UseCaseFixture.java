@@ -32,8 +32,6 @@ public class UseCaseFixture {
     public static final UseCases useCases = new UseCases(
         ocflObjectVersionDao,
         tarDao,
-        Mappers.getMapper(OcflObjectVersionMapper.class),
-        Mappers.getMapper(TarMapper.class),
         searchIndex
     );
 
