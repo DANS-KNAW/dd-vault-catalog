@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.catalog.api.OcflObjectVersionDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionParametersDto;
 import nl.knaw.dans.catalog.api.OcflObjectVersionRefDto;
+import nl.knaw.dans.catalog.api.TarDto;
 import nl.knaw.dans.catalog.api.TarParameterDto;
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyExistsException;
 import nl.knaw.dans.catalog.core.exception.OcflObjectVersionAlreadyInTarException;
@@ -71,7 +72,7 @@ public class UseCases {
 
         log.info("Found {} OCFL object versions for NBN {}", results.size(), nbn);
 
-        if (results.size() == 0) {
+        if (results.isEmpty()) {
             throw new OcflObjectVersionNotFoundException(
                 String.format("No OCFL object versions found for NBN %s", nbn)
             );
@@ -102,7 +103,7 @@ public class UseCases {
     }
 
     @UnitOfWork
-    public Tar createTar(String id, TarParameterDto params) throws TarAlreadyExistsException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
+    public TarDto createTar(String id, TarParameterDto params) throws TarAlreadyExistsException, OcflObjectVersionNotFoundException, OcflObjectVersionAlreadyInTarException {
         var existingTar = tarDao.getTarById(id);
 
         if (existingTar.isPresent()) {
@@ -129,13 +130,14 @@ public class UseCases {
         tar.setTarUuid(id);
         tar.setOcflObjectVersions(ocflObjectVersions);
 
+
         log.info("Saving new TAR {}", tar);
         var result = tarDao.save(tar);
 
         log.info("Indexing TAR in search index: {}", tar);
         searchIndex.indexTar(result);
 
-        return result;
+        return tarMapper.convert(result);
     }
 
     @UnitOfWork

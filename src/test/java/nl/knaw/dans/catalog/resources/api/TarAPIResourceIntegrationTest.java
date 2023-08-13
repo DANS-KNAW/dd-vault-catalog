@@ -91,18 +91,18 @@ class TarAPIResourceIntegrationTest {
             .checksumAlgorithm("MD5")
             .checksumValue("even more secret");
 
+
         var entity = new TarParameterDto()
             .archivalTimestamp(OffsetDateTime.now())
             .vaultPath("test")
             .tarUuid(UUID.randomUUID())
             .tarParts(List.of(part1, part2));
 
-        var str = SUPPORT.getObjectMapper().writeValueAsString(entity);
-
-        try (var response = client.target(
-                String.format("http://localhost:%d/tar", SUPPORT.getLocalPort()))
+        var tarJson = SUPPORT.getObjectMapper().writeValueAsString(entity);
+        try (var response = client
+            .target(String.format("http://localhost:%d/tar", SUPPORT.getLocalPort()))
             .request()
-            .post(Entity.json(str))) {
+            .post(Entity.json(tarJson))) {
 
             assertEquals(201, response.getStatus());
 

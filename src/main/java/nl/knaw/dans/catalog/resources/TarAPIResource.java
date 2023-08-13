@@ -43,9 +43,7 @@ public class TarAPIResource implements TarApi {
         log.info("Received new TAR {}, storing in database", tarDto);
 
         try {
-            var result = useCases.createTar(tarDto.getTarUuid().toString(), tarDto);
-            var converted = tarMapper.convert(result);
-            return Response.ok(converted).status(201).build();
+            return Response.ok(useCases.createTar(tarDto.getTarUuid().toString(), tarDto)).status(201).build();
         }
         catch (OcflObjectVersionAlreadyInTarException | TarAlreadyExistsException e) {
             log.error(e.getMessage());

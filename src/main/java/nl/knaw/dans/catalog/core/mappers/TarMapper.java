@@ -15,21 +15,65 @@
  */
 package nl.knaw.dans.catalog.core.mappers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.knaw.dans.catalog.api.TarDto;
 import nl.knaw.dans.catalog.api.TarParameterDto;
+import nl.knaw.dans.catalog.api.TarPartDto;
 import nl.knaw.dans.catalog.api.TarPartParameterDto;
 import nl.knaw.dans.catalog.core.Tar;
 import nl.knaw.dans.catalog.core.TarPart;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Mapper
 public interface TarMapper {
+    ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     Tar convert(TarParameterDto parameters);
+
+    TarDto convert(Tar tar);
+
+    @Mapping(source = "tar.tarUuid", target = "tarUuid")
+    TarPartDto convert(TarPart tarPart);
 
     TarPart convert(TarPartParameterDto parameters);
 
     default String mapTarUuid(UUID uuid) {
         return uuid.toString();
+    }
+
+    default String mapMetadata(Map<String, Object> value) throws JsonProcessingException {
+        if (value == null) {
+            return null;
+        }
+
+        return OBJECT_MAPPER.writeValueAsString(value);
+    }
+
+    default Map<String, Object> mapMetadata(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        try {
+            return OBJECT_MAPPER.readValue(value, new TypeReference<>() {
+
+            });
+        }
+        catch (JsonProcessingException e) {
+            throw new RuntimeException(String.format("Unable to parse JSON: %s", value), e);
+        }
+    }
+
+    default UUID mapUuid(String value) {
+        if (value == null) {
+            return null;
+        }
+        return UUID.fromString(value);
     }
 }
