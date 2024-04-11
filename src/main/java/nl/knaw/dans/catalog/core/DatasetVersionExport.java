@@ -73,7 +73,7 @@ public class DatasetVersionExport {
     private String otherIdVersion;
 
     @Lob
-    @Column(name = "metadata", columnDefinition = "TEXT")
+    @Column(name = "metadata")
     private String metadata;
 
     @Column(name = "file_to_local_path")

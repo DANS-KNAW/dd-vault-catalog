@@ -16,6 +16,7 @@
 package nl.knaw.dans.catalog.resources;
 
 import lombok.extern.slf4j.Slf4j;
+import nl.knaw.dans.lib.util.VersionProvider;
 
 import javax.ws.rs.core.Response;
 
@@ -24,7 +25,12 @@ public class DefaultApiResource implements DefaultApi {
 
     @Override
     public Response getInfo() {
-        // TODO figure out what the version means, and where to get it from
-        return Response.ok("DANS VAULT CATALOG SERVICE running v1.2.3").build();
+        try {
+            return Response.ok(String.format("DD Vault Catalog Service v%s running", new VersionProvider().getVersion())).build();
+        }
+        catch (Exception e) {
+            log.error("Error while getting version", e);
+            return Response.serverError().entity("Error while getting version").build();
+        }
     }
 }
