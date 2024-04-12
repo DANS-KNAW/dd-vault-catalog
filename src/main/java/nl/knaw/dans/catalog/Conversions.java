@@ -83,6 +83,14 @@ public interface Conversions {
 
     @Mapping(target = "versionExports", source = "dataset.datasetVersionExports", qualifiedByName = "mapDatasetVersionExportListToVersionExportDtoList")
     DatasetDto convert(Dataset dataset);
+    
+    
+    default URI convert(String value) {
+        if (value == null) {
+            return null;
+        }
+        return URI.create(value);
+    }
 
     default UUID stringToUuid(String value) {
         if (value == null) {

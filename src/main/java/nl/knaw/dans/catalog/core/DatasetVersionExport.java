@@ -18,14 +18,25 @@ package nl.knaw.dans.catalog.core;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import nl.knaw.dans.validation.UrnUuid;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -52,7 +63,9 @@ public class DatasetVersionExport {
     private Dataset dataset;
 
     @Column(name = "bag_id", columnDefinition = "uuid", nullable = false)
-    private UUID bagId;
+    @Convert(converter = UrnUuidConverter.class)
+    @UrnUuid
+    private URI bagId;
 
     @Column(name = "ocfl_object_version_number", nullable = false)
     private Integer ocflObjectVersionNumber;
@@ -82,7 +95,7 @@ public class DatasetVersionExport {
     @Column(name = "deaccessioned")
     private Boolean deaccessioned;
 
-    @Column(name ="exporter")
+    @Column(name = "exporter")
     private String exporter;
 
     @Column(name = "exporter_version")
