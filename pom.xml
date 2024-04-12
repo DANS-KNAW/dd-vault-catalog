@@ -211,6 +211,7 @@
                             <apiPackage>nl.knaw.dans.catalog.resources</apiPackage>
                             <modelPackage>nl.knaw.dans.catalog.api</modelPackage>
                             <invokerPackage>nl.knaw.dans.catalog.resources</invokerPackage>
+                            <templateDirectory>${project.basedir}/src/main/resources/openapi-generator-templates</templateDirectory>
                         </configuration>
                     </execution>
                 </executions>

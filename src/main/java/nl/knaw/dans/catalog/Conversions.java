@@ -44,10 +44,15 @@ public interface Conversions {
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Mapping(target = "datasetNbn", source = "dataset.nbn")
+    @Mapping(target = "removeMetadataItem", ignore = true) // Not sure why mapstruct thinks the removeMetadataItem method is a property
     VersionExportDto convert(DatasetVersionExport datasetVersionExport);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dataset", ignore = true)
     DatasetVersionExport convert(VersionExportDto versionExportDto);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dataset", ignore = true)
     void updateVersionExportFromDto(VersionExportDto versionExportDto, @MappingTarget DatasetVersionExport datasetVersionExport);
 
     @Named("mapVersionExportDtoListToDatasetVersionExportList")
@@ -78,10 +83,12 @@ public interface Conversions {
     }
 
     @Mapping(target = "datasetVersionExports", source = "datasetDto.versionExports", qualifiedByName = "mapVersionExportDtoListToDatasetVersionExportList")
+    @Mapping(target = "id", ignore = true)
     Dataset convert(DatasetDto datasetDto);
 
 
     @Mapping(target = "versionExports", source = "dataset.datasetVersionExports", qualifiedByName = "mapDatasetVersionExportListToVersionExportDtoList")
+    @Mapping(target = "removeVersionExportsItem", ignore = true) // Not sure why mapstruct thinks the removeVersionExportsItem method is a property
     DatasetDto convert(Dataset dataset);
     
     
@@ -90,21 +97,6 @@ public interface Conversions {
             return null;
         }
         return URI.create(value);
-    }
-
-    default UUID stringToUuid(String value) {
-        if (value == null) {
-            return null;
-        }
-        return UrnUuid.fromString(value).getUuid();
-    }
-
-    default String uuidToString(UUID value) {
-        if (value == null) {
-            return null;
-        }
-        var uri = URI.create("urn:uuid:" + value);
-        return uri.toString();
     }
 
     default String objectToString(Object value) {

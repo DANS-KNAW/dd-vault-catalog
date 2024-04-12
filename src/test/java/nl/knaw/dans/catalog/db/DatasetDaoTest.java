@@ -42,7 +42,6 @@ public class DatasetDaoTest {
         db.inTransaction(() -> {
             Dataset dataset = new Dataset();
             dataset.setNbn("123");
-            dataset.setTitle("title");
             dataset.setDataversePid("dataversePid");
             dataset.setSwordToken(swordToken);
             dataset.setDataSupplier("dataSupplier");
@@ -54,7 +53,6 @@ public class DatasetDaoTest {
         db.inTransaction(() -> {
             var dataset = dao.findByNbn("123");
             assertThat(dataset).isPresent();
-            assertThat(dataset.get().getTitle()).isEqualTo("title");
             assertThat(dataset.get().getDataversePid()).isEqualTo("dataversePid");
             assertThat(dataset.get().getSwordToken()).isEqualTo(swordToken);
             assertThat(dataset.get().getDataSupplier()).isEqualTo("dataSupplier");
@@ -68,7 +66,6 @@ public class DatasetDaoTest {
         db.inTransaction(() -> {
             Dataset dataset = new Dataset();
             dataset.setNbn("123");
-            dataset.setTitle("title");
             dataset.setDataversePid("dataversePid");
             dataset.setSwordToken(swordToken);
             dataset.setDataSupplier("dataSupplier");
@@ -84,21 +81,20 @@ public class DatasetDaoTest {
         db.inTransaction(() -> {
             Dataset dataset = new Dataset();
             dataset.setNbn("123");
-            dataset.setTitle("title");
             dataset.setDataversePid("dataversePid");
             dataset.setSwordToken(swordToken);
             dataset.setDataSupplier("dataSupplier");
             dataset.setDatastation("datastation");
             dao.save(dataset);
             assertThat(dataset.getId()).isNotNull();
-            dataset.setTitle("new title");
+            dataset.setDataSupplier("new dataSupplier");
             dao.save(dataset);
         });
 
         db.inTransaction(() -> {
             var dataset = dao.findByNbn("123");
             assertThat(dataset).isPresent();
-            assertThat(dataset.get().getTitle()).isEqualTo("new title");
+            assertThat(dataset.get().getDataSupplier()).isEqualTo("new dataSupplier");
         });
     }
 
@@ -108,7 +104,6 @@ public class DatasetDaoTest {
         db.inTransaction(() -> {
             Dataset dataset = new Dataset();
             dataset.setNbn("123");
-            dataset.setTitle("title");
             dataset.setDataversePid("dataversePid");
             dataset.setSwordToken(swordToken);
             dataset.setDataSupplier("dataSupplier");

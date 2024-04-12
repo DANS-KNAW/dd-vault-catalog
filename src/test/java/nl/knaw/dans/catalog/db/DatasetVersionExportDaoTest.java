@@ -44,7 +44,6 @@ public class DatasetVersionExportDaoTest {
         db.inTransaction(() -> {
             var parentDataset = new Dataset();
             parentDataset.setNbn("123");
-            parentDataset.setTitle("title");
             parentDataset.setDataversePid("dataversePid");
             parentDataset.setSwordToken(swordToken);
             parentDataset.setDataSupplier("dataSupplier");

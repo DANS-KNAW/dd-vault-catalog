@@ -58,9 +58,6 @@ public class Dataset {
     @Column(name = "nbn", nullable = false)
     private String nbn;
 
-    @Column(name = "title")
-    private String title;
-
     @Column(name = "dataverse_pid")
     private String dataversePid;
 

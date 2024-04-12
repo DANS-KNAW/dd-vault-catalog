@@ -16,7 +16,6 @@
 package nl.knaw.dans.catalog.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +37,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "dataset_version_export", uniqueConstraints = {
@@ -73,8 +71,8 @@ public class DatasetVersionExport {
     @Column(name = "created_timestamp", nullable = false)
     private OffsetDateTime createdTimestamp;
 
-    @Column(name = "archive_timestamp")
-    private OffsetDateTime archiveTimestamp;
+    @Column(name = "archived_timestamp")
+    private OffsetDateTime archivedTimestamp;
 
     @Column(name = "dataverse_pid_version")
     private String dataversePidVersion;
@@ -89,8 +87,8 @@ public class DatasetVersionExport {
     @Column(name = "metadata")
     private String metadata;
 
-    @Column(name = "file_to_local_path")
-    private String fileToLocalPath;
+    @Column(name = "file_pid_to_local_path")
+    private String filePidToLocalPath;
 
     @Column(name = "deaccessioned")
     private Boolean deaccessioned;
