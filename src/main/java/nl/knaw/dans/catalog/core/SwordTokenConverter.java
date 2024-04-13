@@ -17,19 +17,17 @@ package nl.knaw.dans.catalog.core;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.util.UUID;
 
 @Converter(autoApply = true)
-public class SwordTokenConverter implements AttributeConverter<String, UUID> {
+public class SwordTokenConverter implements AttributeConverter<String, String> {
 
     @Override
-    public UUID convertToDatabaseColumn(String swordToken) {
-        var uuidPart = swordToken.substring("sword:".length());
-        return UUID.fromString(uuidPart);
+    public String convertToDatabaseColumn(String swordToken) {
+        return swordToken.substring("sword:".length());
     }
 
     @Override
-    public String convertToEntityAttribute(UUID uuid) {
-        return "sword:" + uuid.toString();
+    public String convertToEntityAttribute(String uuid) {
+        return "sword:" + uuid;
     }
 }

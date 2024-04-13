@@ -61,7 +61,7 @@ public class Dataset {
     @Column(name = "dataverse_pid")
     private String dataversePid;
 
-    @Column(name = "sword_token", columnDefinition = "uuid")
+    @Column(name = "sword_token")
     @Convert(converter = SwordTokenConverter.class)
     @SwordToken
     private String swordToken;

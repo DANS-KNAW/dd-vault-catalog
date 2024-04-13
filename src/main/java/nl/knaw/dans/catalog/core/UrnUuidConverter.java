@@ -18,18 +18,17 @@ package nl.knaw.dans.catalog.core;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.net.URI;
-import java.util.UUID;
 
 @Converter(autoApply = true)
-public class UrnUuidConverter implements AttributeConverter<URI, UUID> {
+public class UrnUuidConverter implements AttributeConverter<URI, String> {
 
     @Override
-    public UUID convertToDatabaseColumn(URI urn) {
-        return UUID.fromString(urn.getSchemeSpecificPart().substring("uuid:".length()));
+    public String convertToDatabaseColumn(URI urn) {
+        return urn.getSchemeSpecificPart().substring("uuid:".length());
     }
 
     @Override
-    public URI convertToEntityAttribute(UUID uuid) {
-        return URI.create("urn:uuid:" + uuid.toString());
+    public URI convertToEntityAttribute(String uuid) {
+        return URI.create("urn:uuid:" + uuid);
     }
 }

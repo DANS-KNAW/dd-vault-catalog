@@ -60,7 +60,7 @@ public class DatasetVersionExport {
     @JsonIgnore
     private Dataset dataset;
 
-    @Column(name = "bag_id", columnDefinition = "uuid", nullable = false)
+    @Column(name = "bag_id", nullable = false)
     @Convert(converter = UrnUuidConverter.class)
     @UrnUuid
     private URI bagId;
