@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import nl.knaw.dans.convert.jpa.SwordTokenConverter;
 import nl.knaw.dans.validation.SwordToken;
 
 import javax.persistence.CascadeType;

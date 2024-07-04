@@ -19,9 +19,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.catalog.api.DatasetDto;
+import nl.knaw.dans.catalog.api.FileMetaDto;
 import nl.knaw.dans.catalog.api.VersionExportDto;
 import nl.knaw.dans.catalog.core.Dataset;
 import nl.knaw.dans.catalog.core.DatasetVersionExport;
+import nl.knaw.dans.catalog.core.FileMeta;
 import nl.knaw.dans.lib.util.UrnUuid;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -42,9 +44,16 @@ import java.util.UUID;
 public interface Conversions {
 
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    
+    FileMetaDto convert(FileMeta fileMeta);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "versionExport", ignore = true)
+    FileMeta convert(FileMetaDto fileMetaDto);
+    
     @Mapping(target = "datasetNbn", source = "dataset.nbn")
     @Mapping(target = "removeMetadataItem", ignore = true) // Not sure why mapstruct thinks the removeMetadataItem method is a property
+    @Mapping(target = "removeFileMetasItem", ignore = true) // Not sure why mapstruct thinks the removeFileMetasItem method is a property
     VersionExportDto convert(DatasetVersionExport datasetVersionExport);
 
     @Mapping(target = "id", ignore = true)

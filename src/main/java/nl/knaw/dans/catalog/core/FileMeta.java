@@ -58,7 +58,7 @@ public class FileMeta {
     private DatasetVersionExport versionExport;
 
     @Column(name = "filepath", nullable = false)
-    private String path;
+    private String filepath;
 
     @Column(name = "file_uri", nullable = false)
     @Convert(converter = UriConverter.class)
@@ -66,4 +66,7 @@ public class FileMeta {
 
     @Column(name = "byte_size", nullable = false)
     private Long byteSize;
+    
+    @Column(name = "sha1sum", nullable = false) 
+    private String sha1sum;
 }

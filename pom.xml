@@ -40,7 +40,7 @@
 
     <properties>
         <main-class>nl.knaw.dans.catalog.DdVaultCatalogApplication</main-class>
-        <dd-vault-catalog-api.version>0.6.0</dd-vault-catalog-api.version>
+        <dd-vault-catalog-api.version>0.6.1-SNAPSHOT</dd-vault-catalog-api.version>
     </properties>
 
     <dependencies>
@@ -83,6 +83,7 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-java-utils</artifactId>
+            <version>0.15.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>nl.knaw.dans</groupId>
@@ -91,7 +92,7 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-converter-lib</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>

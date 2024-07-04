@@ -27,11 +27,11 @@ import io.dropwizard.jersey.errors.ErrorMessage;
 import io.dropwizard.views.common.View;
 import io.dropwizard.views.common.ViewBundle;
 import nl.knaw.dans.catalog.config.DdVaultCatalogConfig;
-import nl.knaw.dans.catalog.core.DefaultMediaTypeFilter;
 import nl.knaw.dans.catalog.db.DatasetDao;
 import nl.knaw.dans.catalog.resources.DatasetApiResource;
 import nl.knaw.dans.catalog.resources.DefaultApiResource;
 import nl.knaw.dans.catalog.resources.ErrorView;
+import nl.knaw.dans.lib.util.DefaultMediaTypeFilter;
 
 import javax.ws.rs.core.MediaType;
 

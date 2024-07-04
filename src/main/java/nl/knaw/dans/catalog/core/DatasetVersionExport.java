@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import nl.knaw.dans.convert.jpa.UrnUuidConverter;
 import nl.knaw.dans.validation.UrnUuid;
 
 import javax.persistence.CascadeType;
@@ -106,4 +107,9 @@ public class DatasetVersionExport {
     @OneToMany(mappedBy = "versionExport", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<FileMeta> fileMetas = new ArrayList<>();
+    
+    public void addFileMeta(FileMeta fileMeta) {
+        fileMetas.add(fileMeta);
+        fileMeta.setVersionExport(this);
+    }
 }
