@@ -19,6 +19,7 @@ import io.dropwizard.testing.junit5.DAOTestExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import nl.knaw.dans.catalog.core.Dataset;
 import nl.knaw.dans.catalog.core.DatasetVersionExport;
+import nl.knaw.dans.catalog.core.FileMeta;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -33,6 +34,7 @@ public class DatasetDaoTest {
     private final DAOTestExtension db = DAOTestExtension.newBuilder()
         .addEntityClass(Dataset.class)
         .addEntityClass(DatasetVersionExport.class)
+        .addEntityClass(FileMeta.class)
         .build();
     private final DatasetDao dao = new DatasetDao(db.getSessionFactory());
 

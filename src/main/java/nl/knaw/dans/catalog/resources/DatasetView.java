@@ -56,7 +56,6 @@ public class DatasetView extends View {
             dveCopy.setOtherId(dve.getOtherId());
             dveCopy.setOtherIdVersion(dve.getOtherIdVersion());
             dveCopy.setMetadata(null); // Not displayed, so avoid retrieving it from the database
-            dveCopy.setFilePidToLocalPath(dve.getFilePidToLocalPath());
             dveCopy.setDeaccessioned(dve.getDeaccessioned());
             dveCopy.setExporter(dve.getExporter());
             dveCopy.setExporterVersion(dve.getExporterVersion());
