@@ -96,7 +96,11 @@ public class DatasetApiResource implements DatasetApi {
             .map(MediaType::valueOf);
         Optional<Dataset> datasetOptional = datasetDao.findByNbn(nbn);
         if (datasetOptional.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).entity(new FindDatasetView()).build();
+            if (acceptedMediaTypes.anyMatch(MediaType.TEXT_HTML_TYPE::isCompatible)) {
+                return Response.status(Response.Status.NOT_FOUND).entity(new FindDatasetView()).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
         }
         Dataset dataset = datasetOptional.get();
         if (acceptedMediaTypes.anyMatch(MediaType.TEXT_HTML_TYPE::isCompatible)) {

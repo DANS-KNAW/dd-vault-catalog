@@ -40,7 +40,7 @@
 
     <properties>
         <main-class>nl.knaw.dans.catalog.DdVaultCatalogApplication</main-class>
-        <dd-vault-catalog-api.version>0.6.1-SNAPSHOT</dd-vault-catalog-api.version>
+        <dd-vault-catalog-api.version>0.7.0-SNAPSHOT</dd-vault-catalog-api.version>
     </properties>
 
     <dependencies>
