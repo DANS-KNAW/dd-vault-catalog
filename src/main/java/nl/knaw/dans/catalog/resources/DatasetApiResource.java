@@ -33,7 +33,6 @@ import org.mapstruct.factory.Mappers;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -56,7 +55,14 @@ public class DatasetApiResource implements DatasetApi {
         if (dataset.isPresent()) {
             return Response.status(Response.Status.CONFLICT).entity("Dataset already exists").build();
         }
-        datasetDao.save(conversions.convert(datasetDto));
+        try {
+            datasetDao.save(conversions.convert(datasetDto));
+        }
+        catch (Exception e) {
+            // Logging this here, because Jersey, sometime has a hard time turning it into an understandable log message.
+            log.error("Error saving dataset", e);
+            return Response.serverError().build();
+        }
         return Response.ok().build();
     }
 
@@ -96,9 +102,11 @@ public class DatasetApiResource implements DatasetApi {
             .map(MediaType::valueOf);
         Optional<Dataset> datasetOptional = datasetDao.findByNbn(nbn);
         if (datasetOptional.isEmpty()) {
+            // Make sure you do not try to return a view when the client does not accept HTML, because this will cause Jackson to try to serialize the view, which is not a JavaBean.
             if (acceptedMediaTypes.anyMatch(MediaType.TEXT_HTML_TYPE::isCompatible)) {
                 return Response.status(Response.Status.NOT_FOUND).entity(new FindDatasetView()).build();
-            } else {
+            }
+            else {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         }
