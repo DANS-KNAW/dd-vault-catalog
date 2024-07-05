@@ -35,8 +35,8 @@ public class DatasetView extends View {
          * N.B. Everything to be displayed must be fetched from the database before the View object leaves the @UnitOfWork
          * scope. Otherwise, the database may be accessed outside a transaction (especially for LOB fields), which is not
          * allowed. This is even true for fields that are not explicitly references from the template, such as 'metadata'.
-         * As an alternative, the complete Dataset, DVE and all its fields could be fetched eagerly, but that could be
-         * inefficient.
+         * This is why a copy of the Dataset is made here, with the 'metadata' field set to null. As an alternative, the 
+         * complete Dataset, DVE and all its fields could be fetched eagerly, but that could be inefficient.
          */
         this.dataset = dataset;
         this.datasetVersionExports = copyWithoutMetadataField(dataset.getDatasetVersionExports());
@@ -60,6 +60,9 @@ public class DatasetView extends View {
             dveCopy.setExporter(dve.getExporter());
             dveCopy.setExporterVersion(dve.getExporterVersion());
             dveCopy.setSkeletonRecord(dve.getSkeletonRecord());
+            for (var fileMeta : dve.getFileMetas()) {
+                dveCopy.addFileMeta(fileMeta);
+            }
             copy.add(dveCopy);
         }
         return copy;
