@@ -11,6 +11,34 @@ body {
     font-size: 12px;
 }
 
+h1 {
+    font-size: 2.0em;
+    margin-top: 0;
+    text-color: lightgrey;
+}
+
+.header-container {
+    display: flex; 
+    align-items: center; 
+}
+
+.header-image {
+    margin-right: 10px; 
+    height: 30px;
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+.title {
+    font-style: italic;
+}
+
 table.dataset-metadata {
 }
 

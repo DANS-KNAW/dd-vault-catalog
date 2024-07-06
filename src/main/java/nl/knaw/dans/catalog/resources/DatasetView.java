@@ -21,13 +21,16 @@ import nl.knaw.dans.catalog.core.Dataset;
 import nl.knaw.dans.catalog.core.DatasetVersionExport;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class DatasetView extends View {
 
     private final Dataset dataset;
     private final List<DatasetVersionExport> datasetVersionExports;
+    private final String title;
 
     protected DatasetView(Dataset dataset) {
         super("dataset.mustache");
@@ -35,11 +38,19 @@ public class DatasetView extends View {
          * N.B. Everything to be displayed must be fetched from the database before the View object leaves the @UnitOfWork
          * scope. Otherwise, the database may be accessed outside a transaction (especially for LOB fields), which is not
          * allowed. This is even true for fields that are not explicitly references from the template, such as 'metadata'.
-         * This is why a copy of the Dataset is made here, with the 'metadata' field set to null. As an alternative, the 
+         * This is why a copy of the Dataset is made here, with the 'metadata' field set to null. As an alternative, the
          * complete Dataset, DVE and all its fields could be fetched eagerly, but that could be inefficient.
          */
         this.dataset = dataset;
-        this.datasetVersionExports = copyWithoutMetadataField(dataset.getDatasetVersionExports());
+        this.datasetVersionExports = copyWithoutMetadataField(dataset.getDatasetVersionExports()).stream()
+                .sorted(Comparator.comparing(DatasetVersionExport::getOcflObjectVersionNumber).reversed())
+                .toList();
+        if (dataset.getDatasetVersionExports().isEmpty()) {
+            this.title = "N/a";
+        }
+        else {
+            this.title = Optional.ofNullable(dataset.getDatasetVersionExports().get(dataset.getDatasetVersionExports().size() - 1).getTitle()).orElse("N/a");
+        }
     }
 
     private List<DatasetVersionExport> copyWithoutMetadataField(List<DatasetVersionExport> originalDves) {
@@ -51,6 +62,7 @@ public class DatasetView extends View {
             dveCopy.setBagId(dve.getBagId());
             dveCopy.setOcflObjectVersionNumber(dve.getOcflObjectVersionNumber());
             dveCopy.setCreatedTimestamp(dve.getCreatedTimestamp());
+            dveCopy.setTitle(dve.getTitle());
             dveCopy.setArchivedTimestamp(dve.getArchivedTimestamp());
             dveCopy.setDataversePidVersion(dve.getDataversePidVersion());
             dveCopy.setOtherId(dve.getOtherId());

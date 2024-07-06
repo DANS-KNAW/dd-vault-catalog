@@ -55,14 +55,7 @@ public class DatasetApiResource implements DatasetApi {
         if (dataset.isPresent()) {
             return Response.status(Response.Status.CONFLICT).entity("Dataset already exists").build();
         }
-        try {
-            datasetDao.save(conversions.convert(datasetDto));
-        }
-        catch (Exception e) {
-            // Logging this here, because Jersey, sometime has a hard time turning it into an understandable log message.
-            log.error("Error saving dataset", e);
-            return Response.serverError().build();
-        }
+        datasetDao.save(conversions.convert(datasetDto));
         return Response.ok().build();
     }
 

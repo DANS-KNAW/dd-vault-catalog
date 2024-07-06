@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>DANS Data Vault Catalog - {{dataset.nbn}} - {{dataset.title}}</title>
+    <title>DANS Data Vault Catalog - {{dataset.nbn}} - {{title}}</title>
     <link rel="stylesheet" type="text/css" href="/assets/css/styles.css">
 </head>
 <body>
-<h1>DANS Data Vault Catalog</h1>
-<h2>{{dataset.title}}</h2>
+<div class="header-container">
+    <img id="dans-logo" alt="" src="/assets/img/DS-DANS-logo.svg" class="header-image">
+    <h1>Data Vault Catalog</h1>
+</div>
+
+<h2 class="title">{{title}}</h2>
 
 <table class="dataset-metadata">
     <tr>
@@ -43,6 +47,10 @@
         <p class="deaccessioned">This version has been deaccessioned.</p>
     {{/deaccessioned}}
     <table class="dve-metadata">
+        <tr>
+            <td class="field-name">Title</td>
+            <td class="field-value">{{title}}</td>
+        </tr>
         <tr>
             <td class="field-name">Bag ID</td>
             <td class="field-value">{{bagId}}</td>

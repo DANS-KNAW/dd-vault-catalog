@@ -79,6 +79,9 @@ public class DatasetVersionExport {
     @Column(name = "archived_timestamp")
     private OffsetDateTime archivedTimestamp;
 
+    @Column(name = "title")
+    private String title;
+    
     @Column(name = "dataverse_pid_version")
     private String dataversePidVersion;
 
