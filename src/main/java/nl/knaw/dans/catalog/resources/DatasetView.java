@@ -46,10 +46,10 @@ public class DatasetView extends View {
                 .sorted(Comparator.comparing(DatasetVersionExport::getOcflObjectVersionNumber).reversed())
                 .toList();
         if (dataset.getDatasetVersionExports().isEmpty()) {
-            this.title = "N/a";
+            this.title = "<no title>";
         }
         else {
-            this.title = Optional.ofNullable(dataset.getDatasetVersionExports().get(dataset.getDatasetVersionExports().size() - 1).getTitle()).orElse("N/a");
+            this.title = Optional.ofNullable(dataset.getDatasetVersionExports().get(dataset.getDatasetVersionExports().size() - 1).getTitle()).orElse("<no title>");
         }
     }
 

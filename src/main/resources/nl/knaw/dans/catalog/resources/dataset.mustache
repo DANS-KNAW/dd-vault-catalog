@@ -7,7 +7,7 @@
 <body>
 <div class="header-container">
     <img id="dans-logo" alt="" src="/assets/img/DS-DANS-logo.svg" class="header-image">
-    <h1>Data Vault Catalog</h1>
+    <h1>DANS Data Vault Catalog summary for {{dataset.nbn}}</h1>
 </div>
 
 <h2 class="title">{{title}}</h2>
@@ -98,6 +98,8 @@
             </tr>
         {{/exporterVersion}}
     </table>
+    
+    {{#fileMetas.size}}
     <table class="file-table">
         <thead>
         <tr>
@@ -114,6 +116,10 @@
             </tr>
         {{/fileMetas}}
     </table>
+    {{/fileMetas.size}}
+    {{^fileMetas.size}}
+        <p class="no-files">No files in this version.</p>
+    {{/fileMetas.size}}
 {{/datasetVersionExports}}
 
 </body>

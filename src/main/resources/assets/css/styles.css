@@ -22,11 +22,6 @@ h1 {
     align-items: center; 
 }
 
-.header-image {
-    margin-right: 10px; 
-    height: 30px;
-}
-
 h2 {
     font-size: 1.8em;
 }
@@ -35,8 +30,13 @@ h3 {
     font-size: 1.5em;
 }
 
-.title {
+p.no-files {
     font-style: italic;
+}
+
+h2.title {
+    font-style: italic;
+    font-family: "Times New Roman", serif;
 }
 
 table.dataset-metadata {
