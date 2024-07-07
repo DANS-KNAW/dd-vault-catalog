@@ -70,7 +70,6 @@ public interface Conversions {
     }
 
     @Mapping(target = "datasetNbn", source = "dataset.nbn")
-    @Mapping(target = "removeMetadataItem", ignore = true) // Not sure why mapstruct thinks the removeMetadataItem method is a property
     @Mapping(target = "removeFileMetasItem", ignore = true) // Not sure why mapstruct thinks the removeFileMetasItem method is a property
     @Mapping(target = "fileMetas", source = "datasetVersionExport.fileMetas", qualifiedByName = "mapFileMetaListToFileMetaDtoList")
     VersionExportDto convert(DatasetVersionExport datasetVersionExport);
