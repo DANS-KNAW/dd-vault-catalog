@@ -36,4 +36,10 @@ public class DatasetVersionExportApiResource implements DatasetVersionExportApi 
     public Response getDatasetVersionExportByBagId(String bagId) {
         return Response.ok(conversions.convert(dao.findByBagId(URI.create(bagId)))).build();
     }
+
+    @Override
+    @UnitOfWork
+    public Response getUnconfirmedDatasetVersionExports(Integer limit, Integer offset) {
+        return Response.ok(conversions.convertDatasetVersionExportList(dao.findUnconfirmed(limit, offset))).build();
+    }
 }
