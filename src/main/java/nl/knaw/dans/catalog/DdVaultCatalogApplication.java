@@ -35,6 +35,7 @@ import nl.knaw.dans.catalog.resources.DatasetVersionExportApiResource;
 import nl.knaw.dans.catalog.resources.DefaultApiResource;
 import nl.knaw.dans.catalog.resources.ErrorView;
 import nl.knaw.dans.catalog.resources.IllegalArgumentExceptionMapper;
+import nl.knaw.dans.catalog.resources.UnconfirmedDatasetVersionExportsApiResource;
 import nl.knaw.dans.lib.util.DefaultMediaTypeFilter;
 
 import javax.ws.rs.core.MediaType;
@@ -67,6 +68,7 @@ public class DdVaultCatalogApplication extends Application<DdVaultCatalogConfig>
         environment.jersey().register(new DefaultApiResource());
         environment.jersey().register(new DatasetApiResource(datasetDao));
         environment.jersey().register(new DatasetVersionExportApiResource(datasetVersionExportDao));
+        environment.jersey().register(new UnconfirmedDatasetVersionExportsApiResource(datasetVersionExportDao));
         environment.jersey().register(new DefaultMediaTypeFilter());
         environment.jersey().register(new IllegalArgumentExceptionMapper());
         environment.jersey().register(new ErrorEntityWriter<ErrorMessage, View>(MediaType.TEXT_HTML_TYPE, View.class) {
