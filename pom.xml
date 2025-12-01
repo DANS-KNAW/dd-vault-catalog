@@ -39,6 +39,8 @@
 
     <properties>
         <main-class>nl.knaw.dans.catalog.DdVaultCatalogApplication</main-class>
+        <dd-vault-catalog-api.version>0.10.0</dd-vault-catalog-api.version>
+        <dans-build-resources-maven-plugin.version>0.8.0</dans-build-resources-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -150,6 +152,7 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
+            <version>2.40</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
