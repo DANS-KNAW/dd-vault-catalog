@@ -22,11 +22,11 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>1.9.1-SNAPSHOT</version>
+        <version>1.10.0</version>
     </parent>
 
     <artifactId>dd-vault-catalog</artifactId>
-    <version>0.19.1-SNAPSHOT</version>
+    <version>0.20.1-SNAPSHOT</version>
 
     <name>DD Vault Catalog</name>
     <url>https://github.com/DANS-KNAW/dd-vault-catalog</url>
@@ -205,6 +205,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>compilation-dependencies</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>unpack</goal>
@@ -227,6 +228,7 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>generate-server</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
