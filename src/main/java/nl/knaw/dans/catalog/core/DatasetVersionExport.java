@@ -118,7 +118,7 @@ public class DatasetVersionExport {
 
     public void setTitle(String title) {
         final String ellipsis = "...";
-        if (title != null && title.length() > 300 - ellipsis.length()) {
+        if (title != null && title.length() > 300) {
             this.title = title.substring(0, 300 - ellipsis.length()) + ellipsis;
         }
         else {

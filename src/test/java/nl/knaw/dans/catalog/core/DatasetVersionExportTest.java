@@ -29,17 +29,17 @@ public class DatasetVersionExportTest {
     }
 
     @Test
-    public void setTitle_should_keep_title_when_length_is_at_most_297() {
-        var title = "a".repeat(297);
+    public void setTitle_should_keep_title_when_length_is_at_most_300() {
+        var title = "a".repeat(300);
         var dve = new DatasetVersionExport();
         dve.setTitle(title);
         assertThat(dve.getTitle()).isEqualTo(title);
-        assertThat(dve.getTitle()).hasSize(297);
+        assertThat(dve.getTitle()).hasSize(300);
     }
 
     @Test
-    public void setTitle_should_ellipsize_when_length_exceeds_297() {
-        var original = "x".repeat(350);
+    public void setTitle_should_ellipsize_when_length_exceeds_300() {
+        var original = "x".repeat(301);
         var dve = new DatasetVersionExport();
         dve.setTitle(original);
         assertThat(dve.getTitle()).isNotNull();
