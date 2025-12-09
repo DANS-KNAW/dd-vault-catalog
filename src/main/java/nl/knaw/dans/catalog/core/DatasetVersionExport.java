@@ -79,7 +79,7 @@ public class DatasetVersionExport {
     @Column(name = "archived_timestamp")
     private OffsetDateTime archivedTimestamp;
 
-    @Column(name = "title")
+    @Column(name = "title", length = 300)
     private String title;
     
     @Column(name = "dataverse_pid_version")
@@ -114,5 +114,14 @@ public class DatasetVersionExport {
     public void addFileMeta(FileMeta fileMeta) {
         fileMetas.add(fileMeta);
         fileMeta.setVersionExport(this);
+    }
+
+    // Ensure title does not exceed 300 characters when stored
+    public void setTitle(String title) {
+        if (title != null && title.length() > 300) {
+            this.title = title.substring(0, 300);
+        } else {
+            this.title = title;
+        }
     }
 }
