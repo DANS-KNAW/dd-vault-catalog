@@ -81,7 +81,7 @@ public class DatasetVersionExport {
 
     @Column(name = "title", length = 300)
     private String title;
-    
+
     @Column(name = "dataverse_pid_version")
     private String dataversePidVersion;
 
@@ -110,17 +110,18 @@ public class DatasetVersionExport {
     @OneToMany(mappedBy = "versionExport", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<FileMeta> fileMetas = new ArrayList<>();
-    
+
     public void addFileMeta(FileMeta fileMeta) {
         fileMetas.add(fileMeta);
         fileMeta.setVersionExport(this);
     }
 
-    // Ensure title does not exceed 300 characters when stored
     public void setTitle(String title) {
-        if (title != null && title.length() > 300) {
-            this.title = title.substring(0, 300);
-        } else {
+        final String ellipsis = "...";
+        if (title != null && title.length() > 300 - ellipsis.length()) {
+            this.title = title.substring(0, 300 - ellipsis.length()) + ellipsis;
+        }
+        else {
             this.title = title;
         }
     }
