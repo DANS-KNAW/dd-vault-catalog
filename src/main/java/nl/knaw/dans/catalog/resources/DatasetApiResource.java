@@ -89,6 +89,7 @@ public class DatasetApiResource implements DatasetApi {
     }
 
     @Override
+    @UnitOfWork
     public Response addVersionExport(String nbn, VersionExportDto versionExportDto) {
         var datasetOptional = datasetDao.findByNbn(nbn);
         if (datasetOptional.isEmpty()) {
@@ -101,7 +102,9 @@ public class DatasetApiResource implements DatasetApi {
         if (latestDatasetVersionExportOptional.isPresent() && latestDatasetVersionExportOptional.get().getOcflObjectVersionNumber() + 1 != versionExportDto.getOcflObjectVersionNumber()) {
             return Response.status(Status.CONFLICT).entity("ocflVersionNumber must be one higher than latest existing version's").build();
         }
-        dataset.getDatasetVersionExports().add(conversions.convert(versionExportDto));
+        var versionExport = conversions.convert(versionExportDto);
+        versionExport.setDataset(dataset);
+        dataset.getDatasetVersionExports().add(versionExport);
         datasetDao.save(dataset);
         return Response.ok().build();
     }
