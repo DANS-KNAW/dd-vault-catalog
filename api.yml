@@ -1,0 +1,399 @@
+#
+# Copyright (C) 2023 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+openapi: 3.0.1
+info:
+  title: Vault Catalog Service API
+  version: 1.0.0
+  description: |
+    This document specifies the Vault Catalog Service API. It provides operations to update and retrieve information in the vault catalog.
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: 'http://localhost:20305'
+    description: Local machine running the Vault Catalog Service
+
+paths:
+  /:
+    get:
+      summary: Returns a description of the service and a form for finding a dataset by NBN
+      description:
+        This is the starting place for navigating the Vault Catalog Service. It returns a description of the service.
+      operationId: getInfo
+      parameters:
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+            enum: [ application/json, text/html ]
+            default: application/json
+      responses:
+        200:
+          description: Description of the service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppInfo'
+            text/html:
+              schema:
+                type: string
+
+  /dataset/{nbn}:
+    get:
+      operationId: getDataset
+      parameters:
+        - name: nbn
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Accept
+          in: header
+          required: false
+          schema:
+            type: string
+            enum: [ application/json, text/html ]
+            default: application/json
+      responses:
+        200:
+          description: a description of the dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+            text/html:
+              schema:
+                type: string
+                format: html
+                description: A html representation of the dataset
+    put:
+      operationId: addDataset
+      description: Add a new dataset to the vault catalog. This can be done only once for each dataset, so fields cannot be added incrementally
+        to a dataset, unlike with the VersionExport.
+      parameters:
+        - name: nbn
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        204:
+          description: dataset added
+        400:
+          description: invalid input, object invalid
+        409:
+          description: dataset already exists
+  /dataset:
+    get:
+      operationId: getDatasetBySwordToken
+      parameters:
+        - name: swordToken
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/SwordToken'
+      responses:
+        200:
+          description: a description of the dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+
+  /dataset/{nbn}/versionExport/{ocflObjectVersionNumber}:
+    get:
+      operationId: getVersionExport
+      parameters:
+        - name: nbn
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ocflObjectVersionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: a description of the version export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionExport'
+    put:
+      operationId: updateVersionExport
+      summary: update a skeleton record to a full record
+      description: Updates a skeleton record to a full record. Note, that this will fail for a non-skeleton record.
+      parameters:
+        - name: nbn
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ocflObjectVersionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionExport'
+      responses:
+        200:
+          description: version export updated
+        201:
+          description: version export created
+        400:
+          description: invalid input, object invalid
+        404:
+          description: version export not found
+        409:
+          description: version export found, but not a skeleton record
+
+  /dataset/{nbn}/versionExport:
+    post:
+      operationId: addVersionExport
+      summary: add a version export record
+      description: Adds a version export record to a dataset. The dataset must already exist. The ocflObjectVersionNumber must be one higher than the current highest version export.
+      parameters:
+        - name: nbn
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionExport'
+      responses:
+        200:
+          description: version export created
+        400:
+          description: invalid input, object invalid
+        404:
+          description: dataset not found
+        409:
+          description: version export already exists
+
+  /dataset/{nbn}/versionExport/{ocflObjectVersionNumber}/archivedTimestamp:
+    put:
+      operationId: setVersionExportArchivedTimestamp
+      summary: Sets the archived timestamp for a version export
+      parameters:
+        - name: nbn
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ocflObjectVersionNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              format: date-time
+      responses:
+        200:
+          description: archivedTimestamp updated
+        400:
+          description: invalid input, object invalid
+        404:
+          description: dataset or version export not found
+        409:
+          description: version export already has an archivedTimestamp
+
+  /datasetVersionExport/{bagId}:
+    get:
+      operationId: getDatasetVersionExportByBagId
+      parameters:
+        - name: bagId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/BagId'
+      responses:
+        200:
+          description: a description of the dataset version export
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionExport'
+        404:
+          description: dataset version export not found
+
+  /unconfirmedDatasetVersionExports:
+    get:
+      summary: Get unconfirmed Dataset Version Exports
+      description: Returns Dataset Version Exports with no archivedTimestamp set.
+      operationId: getUnconfirmedDatasetVersionExports
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        200:
+          description: List of unconfirmed Dataset Version Exports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UnconfirmedDatasetVersionExport'
+
+components:
+
+  schemas:
+    AppInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+
+    SwordToken:
+      type: string
+      x-field-extra-annotation: "@nl.knaw.dans.validation.SwordToken"
+
+    BagId:
+      type: string
+      x-field-extra-annotation: "@nl.knaw.dans.validation.UrnUuid"
+
+    Dataset:
+      type: object
+      required:
+        - nbn
+        - ocflStorageRoot
+      properties:
+        nbn:
+          type: string
+        ocflStorageRoot:
+          type: string
+        dataversePid:
+          type: string
+        swordToken:
+          $ref: '#/components/schemas/SwordToken'
+        dataSupplier:
+          type: string
+        versionExports:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/VersionExport'
+
+    VersionExport:
+      type: object
+      required:
+        - datasetNbn
+        - ocflObjectVersionNumber
+        - bagId
+        - createdTimestamp
+      properties:
+        datasetNbn:
+          type: string
+        bagId:
+          $ref: '#/components/schemas/BagId'
+        ocflObjectVersionNumber:
+          type: integer
+        createdTimestamp:
+          type: string
+          format: date-time
+        archivedTimestamp:
+          type: string
+          format: date-time
+        title:
+          type: string
+        dataversePidVersion:
+          type: string
+        otherId:
+          type: string
+        otherIdVersion:
+          type: string
+        metadata:
+          type: string
+        deaccessioned:
+          type: boolean
+        exporter:
+          type: string
+        exporterVersion:
+          type: string
+        skeletonRecord:
+          type: boolean
+        fileMetas:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/FileMeta'
+
+
+    UnconfirmedDatasetVersionExport:
+      type: object
+      required:
+        - storageRoot
+        - datasetNbn
+        - ocflObjectVersionNumber
+      properties:
+        storageRoot:
+          type: string
+        datasetNbn:
+          type: string
+        ocflObjectVersionNumber:
+          type: integer
+
+    FileMeta:
+      type: object
+      required:
+        - filepath
+        - fileUri
+        - sha1sum
+        - byteSize
+      properties:
+        filepath:
+          type: string
+        fileUri:
+          type: string
+          format: uri
+        sha1sum:
+          type: string
+        byteSize:
+          type: integer
+          format: int64
