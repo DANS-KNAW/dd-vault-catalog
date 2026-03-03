@@ -39,7 +39,7 @@ import java.util.List;
 @Entity
 @Table(name = "dataset", uniqueConstraints = {
     @UniqueConstraint(columnNames = { "nbn" }),
-    @UniqueConstraint(columnNames = { "dataverse_pid" }),
+    @UniqueConstraint(columnNames = { "dataverse_pid", "ocfl_storage_root" }),
     @UniqueConstraint(columnNames = { "sword_token" })
 })
 @Getter
