@@ -15,9 +15,6 @@
  */
 package nl.knaw.dans.catalog;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.catalog.api.DatasetDto;
 import nl.knaw.dans.catalog.api.FileMetaDto;
 import nl.knaw.dans.catalog.api.VersionExportDto;
@@ -30,10 +27,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
-import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Conversion between DTOs and domain objects.
@@ -69,11 +70,13 @@ public interface Conversions {
     @Mapping(target = "datasetNbn", source = "dataset.nbn")
     @Mapping(target = "removeFileMetasItem", ignore = true) // Not sure why mapstruct thinks the removeFileMetasItem method is a property
     @Mapping(target = "fileMetas", source = "datasetVersionExport.fileMetas", qualifiedByName = "mapFileMetaListToFileMetaDtoList")
+    @Mapping(target = "metadataEncoding", constant = "PLAIN")
     VersionExportDto convert(DatasetVersionExport datasetVersionExport);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dataset", ignore = true)
     @Mapping(target = "fileMetas", source = "versionExportDto.fileMetas", qualifiedByName = "mapFileMetaDtoListToFileMetaList")
+    @Mapping(target = "metadata", source = "versionExportDto", qualifiedByName = "decompressMetadata")
     DatasetVersionExport convert(VersionExportDto versionExportDto);
 
     @AfterMapping
@@ -85,7 +88,26 @@ public interface Conversions {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "dataset", ignore = true)
+    @Mapping(target = "metadata", source = "versionExportDto", qualifiedByName = "decompressMetadata")
     void updateVersionExportFromDto(VersionExportDto versionExportDto, @MappingTarget DatasetVersionExport datasetVersionExport);
+
+    @Named("decompressMetadata")
+    default String decompressMetadata(VersionExportDto versionExportDto) {
+        if (versionExportDto.getMetadata() == null) {
+            return null;
+        }
+        if (VersionExportDto.MetadataEncodingEnum.GZIP_BASE64.equals(versionExportDto.getMetadataEncoding())) {
+            try {
+                byte[] decoded = Base64.getDecoder().decode(versionExportDto.getMetadata());
+                try (var gzipIn = new GZIPInputStream(new ByteArrayInputStream(decoded))) {
+                    return new String(gzipIn.readAllBytes(), StandardCharsets.UTF_8);
+                }
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Failed to decode gzip-base64 metadata", e);
+            }
+        }
+        return versionExportDto.getMetadata();
+    }
 
     @Named("mapVersionExportDtoListToDatasetVersionExportList")
     default List<DatasetVersionExport> mapVersionExportDtoListToDatasetVersionExportList(List<VersionExportDto> versionExportDtoList) {
