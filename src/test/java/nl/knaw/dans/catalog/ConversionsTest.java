@@ -24,8 +24,12 @@ import nl.knaw.dans.catalog.core.FileMeta;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -618,6 +622,25 @@ public class ConversionsTest {
         assertThat(datasetDto.getVersionExports().get(1).getFileMetas().get(1).getByteSize()).isEqualTo(400L);
     }
     
+    @Test
+    public void convert_VersionExportDto_with_GzipBase64_metadata() throws Exception {
+        var originalMetadata = "this is some metadata that should be compressed";
+        var out = new ByteArrayOutputStream();
+        try (var gzip = new GZIPOutputStream(out)) {
+            gzip.write(originalMetadata.getBytes(StandardCharsets.UTF_8));
+        }
+        var encodedMetadata = Base64.getEncoder().encodeToString(out.toByteArray());
+        
+        var dveDto = new VersionExportDto()
+            .bagId("urn:uuid:1234")
+            .metadataEncoding(VersionExportDto.MetadataEncodingEnum.GZIP_BASE64)
+            .metadata(encodedMetadata);
+
+        var dve = conversions.convert(dveDto);
+
+        assertThat(dve.getMetadata()).isEqualTo(originalMetadata);
+    }
+
     @Test
     public void convert_DatasetDto_to_Dataset() {
         var fileMetaDto1 = new FileMetaDto()
