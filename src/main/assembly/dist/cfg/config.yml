@@ -34,6 +34,9 @@ database:
     hibernate.dialect: 'org.hibernate.dialect.PostgreSQL95Dialect'
     hibernate.hbm2ddl.auto: update
 
+# Directory where to store the restore SQL scripts for deleted version exports
+restoreScriptsDirectory: /var/opt/dans.knaw.nl/tmp/dd-vault-catalog/restore-scripts
+
 logging:
   level: INFO
   appenders:
