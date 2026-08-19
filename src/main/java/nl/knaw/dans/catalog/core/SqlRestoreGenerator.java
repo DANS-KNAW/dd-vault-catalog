@@ -66,7 +66,11 @@ public class SqlRestoreGenerator {
         sql.append("  ").append(escape(export.getDataversePidVersion())).append(",\n");
         sql.append("  ").append(escape(export.getOtherId())).append(",\n");
         sql.append("  ").append(escape(export.getOtherIdVersion())).append(",\n");
-        sql.append("  ").append(escape(export.getMetadata())).append(",\n");
+        if (export.getMetadata() == null) {
+            sql.append("  NULL,\n");
+        } else {
+            sql.append("  lo_from_bytea(0, convert_to(").append(escape(export.getMetadata())).append(", 'UTF8')),\n");
+        }
         sql.append("  ").append(format(export.getDeaccessioned())).append(",\n");
         sql.append("  ").append(escape(export.getExporter())).append(",\n");
         sql.append("  ").append(escape(export.getExporterVersion())).append(",\n");
