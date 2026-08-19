@@ -185,7 +185,7 @@ public class DatasetApiResource implements DatasetApi {
 
     @Override
     @UnitOfWork
-    public Response deleteVersionExport(String nbn, Integer ocflObjectVersion) {
+    public Response deleteVersionExport(String nbn, Integer ocflObjectVersion, Boolean force) {
         var datasetOptional = datasetDao.findByNbn(nbn);
         if (datasetOptional.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).entity("Dataset not found").build();
@@ -197,6 +197,16 @@ public class DatasetApiResource implements DatasetApi {
         if (datasetVersionExportOptional.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).entity("DatasetVersionExport not found").build();
         }
+        
+        var latestVersion = dataset.getDatasetVersionExports().stream()
+            .map(DatasetVersionExport::getOcflObjectVersionNumber)
+            .max(Integer::compareTo)
+            .orElse(0);
+            
+        if (!ocflObjectVersion.equals(latestVersion) && !Boolean.TRUE.equals(force)) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Cannot delete non-latest version export without force").build();
+        }
+
         var datasetVersionExport = datasetVersionExportOptional.get();
 
         boolean deleteDataset = dataset.getDatasetVersionExports().size() == 1;
