@@ -205,11 +205,11 @@ public class DatasetApiResource implements DatasetApi {
         
         try {
             Files.createDirectories(restoreScriptsDirectory);
-            String filename = String.format("restore_%s_%d_%s.sql", 
-                nbn.replace(":", "_"), 
-                ocflObjectVersion, 
-                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(LocalDateTime.now()));
-            Files.writeString(restoreScriptsDirectory.resolve(filename), sql);
+            String safeNbn = nbn.replaceAll("[^A-Za-z0-9._-]", "_");
+            String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS").format(LocalDateTime.now());
+            String filename = String.format("restore_%s_%d_%s.sql", safeNbn, ocflObjectVersion, timestamp);
+            var target = restoreScriptsDirectory.resolve(filename);
+            Files.writeString(target, sql, java.nio.file.StandardOpenOption.CREATE_NEW);
         } catch (IOException e) {
             log.error("Failed to write restore script", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to write restore script").build();
