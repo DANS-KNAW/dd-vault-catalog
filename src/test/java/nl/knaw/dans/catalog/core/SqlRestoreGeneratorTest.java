@@ -65,17 +65,18 @@ class SqlRestoreGeneratorTest {
         String sql = SqlRestoreGenerator.generateRestoreSql(dataset, export, true);
 
         assertThat(sql).contains("BEGIN;");
-        assertThat(sql).contains("INSERT INTO dataset");
-        assertThat(sql).contains("VALUES (");
-        assertThat(sql).contains("1,");
+        assertThat(sql).contains("WITH new_dataset AS (");
+        assertThat(sql).contains("INSERT INTO dataset (nbn, dataverse_pid, sword_token, data_supplier, ocfl_storage_root) VALUES (");
         assertThat(sql).contains("'urn:nbn:nl:ui:13-1234',");
         assertThat(sql).contains("'doi:10.1234/5678',");
         assertThat(sql).contains("'sword:123',");
         assertThat(sql).contains("'DataSupplier',");
         assertThat(sql).contains("'/path/to/root'");
+        assertThat(sql).contains(") RETURNING id");
 
+        assertThat(sql).contains("new_export AS (");
         assertThat(sql).contains("INSERT INTO dataset_version_export");
-        assertThat(sql).contains("10,");
+        assertThat(sql).contains("(SELECT id FROM new_dataset),");
         assertThat(sql).contains("'urn:uuid:12345678-1234-1234-1234-123456789012',");
         assertThat(sql).contains("1,");
         assertThat(sql).contains("'2023-01-01T12:00:00Z',");
@@ -85,7 +86,7 @@ class SqlRestoreGeneratorTest {
         assertThat(sql).contains("'Exporter',");
 
         assertThat(sql).contains("INSERT INTO file_meta");
-        assertThat(sql).contains("100,");
+        assertThat(sql).contains("((SELECT id FROM new_export),");
         assertThat(sql).contains("'data/file.txt',");
         assertThat(sql).contains("'http://example.com/file.txt',");
         assertThat(sql).contains("1024,");
@@ -143,6 +144,29 @@ class SqlRestoreGeneratorTest {
         String sql = SqlRestoreGenerator.generateRestoreSql(dataset, export, true);
 
         // check that "NULL" without quotes is printed for null values instead of "null" string
-        assertThat(sql).contains("  1,\n  NULL,\n  NULL,\n  NULL,\n  NULL,\n  NULL\n);"); // for dataset (id 1, rest nulls)
+        assertThat(sql).contains("WITH new_dataset AS (\n" +
+                                 "  INSERT INTO dataset (nbn, dataverse_pid, sword_token, data_supplier, ocfl_storage_root) VALUES (\n" +
+                                 "    NULL,\n" +
+                                 "    NULL,\n" +
+                                 "    NULL,\n" +
+                                 "    NULL,\n" +
+                                 "    NULL\n" +
+                                 "  ) RETURNING id\n" +
+                                 ")");
+        assertThat(sql).contains("  (SELECT id FROM new_dataset),\n" +
+                                 "  NULL,\n" +
+                                 "  1,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL,\n" +
+                                 "  NULL\n" +
+                                 ");\n");
     }
 }
