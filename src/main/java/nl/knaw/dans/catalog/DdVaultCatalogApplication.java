@@ -66,7 +66,7 @@ public class DdVaultCatalogApplication extends Application<DdVaultCatalogConfig>
         var datasetDao = new DatasetDao(hibernateBundle.getSessionFactory());
         var datasetVersionExportDao = new DatasetVersionExportDao(hibernateBundle.getSessionFactory());
         environment.jersey().register(new DefaultApiResource());
-        environment.jersey().register(new DatasetApiResource(datasetDao));
+        environment.jersey().register(new DatasetApiResource(datasetDao, configuration.getRestoreScriptsDirectory()));
         environment.jersey().register(new DatasetVersionExportApiResource(datasetVersionExportDao));
         environment.jersey().register(new UnconfirmedDatasetVersionExportsApiResource(datasetVersionExportDao));
         environment.jersey().register(new DefaultMediaTypeFilter());

@@ -25,6 +25,7 @@ import nl.knaw.dans.catalog.api.DatasetDto;
 import nl.knaw.dans.catalog.api.VersionExportDto;
 import nl.knaw.dans.catalog.core.Dataset;
 import nl.knaw.dans.catalog.core.DatasetVersionExport;
+import nl.knaw.dans.catalog.core.SqlRestoreGenerator;
 import nl.knaw.dans.catalog.db.DatasetDao;
 import org.apache.hc.core5.http.HeaderElement;
 import org.apache.hc.core5.http.message.BasicHeaderValueParser;
@@ -35,7 +36,12 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -47,6 +53,9 @@ public class DatasetApiResource implements DatasetApi {
 
     @NonNull
     private final DatasetDao datasetDao;
+    
+    @NonNull
+    private final Path restoreScriptsDirectory;
 
     @Override
     @UnitOfWork
@@ -172,5 +181,57 @@ public class DatasetApiResource implements DatasetApi {
             .findFirst()
             .orElseThrow(() -> new NotFoundException("DatasetVersionExport not found"));
         return Response.ok(conversions.convert(datasetVersionExport)).build();
+    }
+
+    @Override
+    @UnitOfWork
+    public Response deleteVersionExport(String nbn, Integer ocflObjectVersion, Boolean force) {
+        var datasetOptional = datasetDao.findByNbn(nbn);
+        if (datasetOptional.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Dataset not found").build();
+        }
+        var dataset = datasetOptional.get();
+        var datasetVersionExportOptional = dataset.getDatasetVersionExports().stream()
+            .filter(dve -> dve.getOcflObjectVersionNumber().equals(ocflObjectVersion))
+            .findFirst();
+        if (datasetVersionExportOptional.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).entity("DatasetVersionExport not found").build();
+        }
+        
+        var latestVersion = dataset.getDatasetVersionExports().stream()
+            .map(DatasetVersionExport::getOcflObjectVersionNumber)
+            .max(Integer::compareTo)
+            .orElse(0);
+            
+        if (!ocflObjectVersion.equals(latestVersion) && !Boolean.TRUE.equals(force)) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Cannot delete non-latest version export without force").build();
+        }
+
+        var datasetVersionExport = datasetVersionExportOptional.get();
+
+        boolean deleteDataset = dataset.getDatasetVersionExports().size() == 1;
+
+        String sql = SqlRestoreGenerator.generateRestoreSql(dataset, datasetVersionExport, deleteDataset);
+        
+        try {
+            Files.createDirectories(restoreScriptsDirectory);
+            String safeNbn = nbn.replaceAll("[^A-Za-z0-9._-]", "_");
+            String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS").format(LocalDateTime.now());
+            String filename = String.format("restore_%s_%d_%s.sql", safeNbn, ocflObjectVersion, timestamp);
+            var target = restoreScriptsDirectory.resolve(filename);
+            Files.writeString(target, sql, java.nio.file.StandardOpenOption.CREATE_NEW);
+        } catch (IOException e) {
+            log.error("Failed to write restore script", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to write restore script").build();
+        }
+
+        if (deleteDataset) {
+            datasetDao.delete(dataset);
+        } else {
+            dataset.getDatasetVersionExports().remove(datasetVersionExport);
+            datasetDao.save(dataset);
+        }
+
+        return Response.noContent().build();
     }
 }

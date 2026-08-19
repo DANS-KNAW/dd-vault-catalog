@@ -18,6 +18,8 @@ database:
   user: dd_vault_catalog_local_test
   password: dd_vault_catalog_local_test
 
+restoreScriptsDirectory: data/restore-scripts
+
 #database:
 #  driverClass: org.hsqldb.jdbcDriver
 #  url: jdbc:hsqldb:hsql://localhost:9001/dd-vault-catalog

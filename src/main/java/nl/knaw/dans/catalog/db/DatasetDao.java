@@ -63,4 +63,8 @@ public class DatasetDao extends AbstractDAO<Dataset> {
             throw new IllegalArgumentException(e.getSQLException().getMessage());
         }
     }
+
+    public void delete(Dataset dataset) {
+        currentSession().delete(dataset);
+    }
 }
