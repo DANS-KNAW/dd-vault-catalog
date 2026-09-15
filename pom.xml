@@ -40,7 +40,6 @@
 
     <properties>
         <main-class>nl.knaw.dans.catalog.DdVaultCatalogApplication</main-class>
-        <dd-vault-catalog-api.version>1.2.0</dd-vault-catalog-api.version>
     </properties>
 
     <dependencies>
@@ -73,11 +72,13 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
+            <!-- TODO: upgrade to nl.datastations when it is released -->
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-java-utils</artifactId>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
-            <groupId>nl.knaw.dans</groupId>
+            <groupId>nl.datastations</groupId>
             <artifactId>dans-validation-lib</artifactId>
         </dependency>
         <dependency>
