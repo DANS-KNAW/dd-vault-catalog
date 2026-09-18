@@ -33,7 +33,8 @@
     <url>https://dans-knaw.github.io/dd-vault-catalog</url>
     <inceptionYear>2022</inceptionYear>
     <scm>
-        <developerConnection>scm:git:ssh://github.com/DANS-KNAW/${project.artifactId}</developerConnection>
+        <connection>scm:git:https://github.com/DANS-KNAW/dd-vault-catalog</connection>
+        <developerConnection>scm:git:ssh://github.com/DANS-KNAW/dd-vault-catalog</developerConnection>
         <tag>HEAD</tag>
         <url>https://github.com/DANS-KNAW/${project.artifactId}</url>
     </scm>
