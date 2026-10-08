@@ -26,7 +26,7 @@
     </parent>
 
     <artifactId>dd-vault-catalog</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
 
     <name>DD Vault Catalog</name>
     <description>Catalog of the contents of the DANS Data Vault</description>
@@ -35,7 +35,7 @@
     <scm>
         <connection>scm:git:https://github.com/DANS-KNAW/dd-vault-catalog</connection>
         <developerConnection>scm:git:ssh://github.com/DANS-KNAW/dd-vault-catalog</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v3.0.0</tag>
         <url>https://github.com/DANS-KNAW/dd-vault-catalog</url>
     </scm>
 
